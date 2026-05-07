@@ -235,4 +235,14 @@ EXPERIENCE: {{experience}}`,
   },
 });
 
+// ── Load Extended Templates ─────────────────────────────
+// Each module file self-registers its templates with the singleton promptEngine.
+require('./templates/script-extra.templates');
+require('./templates/trailer.templates');
+require('./templates/video.templates');
+require('./templates/crew.templates');
+require('./templates/production.templates');
+require('./templates/distribution.templates');
+require('./templates/previz.templates');
+
 module.exports = promptEngine;

@@ -2,7 +2,19 @@
  * @module api/v1/ai/ai.routes
  * @description AI API endpoints — the HTTP interface to the CineHub AI orchestration system.
  *
- * Routes:
+ * ══════════════════════════════════════════════════════════
+ * CENTRALIZED ENDPOINT (recommended):
+ * ══════════════════════════════════════════════════════════
+ *
+ * POST   /generate              — Unified AI generation (module + task routing)
+ * GET    /capabilities           — List all available modules and tasks
+ * GET    /modules                — List available AI modules
+ * GET    /modules/:module/tasks  — List tasks for a module
+ *
+ * ══════════════════════════════════════════════════════════
+ * LEGACY ENDPOINTS (backward compatible):
+ * ══════════════════════════════════════════════════════════
+ *
  * POST   /generate-script     — Generate a script from a premise
  * POST   /enhance-story       — Analyze and enhance an existing script
  * POST   /analyze-genre       — Classify genre with market analysis
@@ -21,6 +33,7 @@ const express = require('express');
 const catchAsync = require('../../../utils/catchAsync');
 const ApiResponse = require('../../../utils/ApiResponse');
 const aiService = require('./ai.service');
+const aiController = require('./ai.controller');
 const { authenticate, aiLimiter, validate } = require('../../../middleware');
 const validation = require('./ai.validation');
 const { logger } = require('../../../config');
@@ -29,6 +42,70 @@ const router = express.Router();
 
 // All AI routes require authentication
 router.use(authenticate());
+
+// ══════════════════════════════════════════════════════════
+// ═  CENTRALIZED AI ENDPOINT
+// ══════════════════════════════════════════════════════════
+
+/**
+ * POST /ai/generate
+ * The ONE unified endpoint for all AI features.
+ *
+ * Body: { module: string, task: string, input: string|object, options?: object }
+ * Response: { success: true, module, task, data, meta }
+ */
+router.post(
+  '/generate',
+  aiLimiter,
+  validate(validation.unifiedGenerate),
+  catchAsync(async (req, res) => {
+    logger.info(`[AI API] Unified generate: ${req.body.module}::${req.body.task} by user ${req.user._id}`);
+
+    const result = await aiController.generate(req);
+
+    ApiResponse.ok(result, 'AI generation successful').send(res);
+  }),
+);
+
+/**
+ * GET /ai/capabilities
+ * Returns all available modules and tasks for frontend discovery.
+ */
+router.get(
+  '/capabilities',
+  catchAsync(async (_req, res) => {
+    const capabilities = aiController.getCapabilities();
+    ApiResponse.ok(capabilities, 'AI capabilities retrieved').send(res);
+  }),
+);
+
+/**
+ * GET /ai/modules
+ * Returns the list of available AI modules.
+ */
+router.get(
+  '/modules',
+  catchAsync(async (_req, res) => {
+    const modules = aiController.getModules();
+    ApiResponse.ok(modules, 'AI modules retrieved').send(res);
+  }),
+);
+
+/**
+ * GET /ai/modules/:module/tasks
+ * Returns tasks for a given module.
+ */
+router.get(
+  '/modules/:module/tasks',
+  catchAsync(async (req, res) => {
+    const tasks = aiController.getModuleTasks(req.params.module);
+    ApiResponse.ok(tasks, 'Module tasks retrieved').send(res);
+  }),
+);
+
+// ══════════════════════════════════════════════════════════
+// ═  LEGACY ENDPOINTS (backward compatible)
+// ══════════════════════════════════════════════════════════
 
 // ── Script Generation ───────────────────────────────────
 

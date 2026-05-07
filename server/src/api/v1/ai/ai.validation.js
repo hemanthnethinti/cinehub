@@ -1,8 +1,68 @@
 /**
  * @module api/v1/ai/ai.validation
  * @description Request validation schemas for AI API endpoints.
+ * Includes both the unified /ai/generate schema and legacy endpoint schemas.
  */
 const Joi = require('joi');
+
+// ═══════════════════════════════════════════════════════════
+// ═  UNIFIED GENERATE VALIDATION
+// ═══════════════════════════════════════════════════════════
+
+const VALID_MODULES = [
+  'script-development',
+  'trailer-concept',
+  'video-enhancement',
+  'cast-crew',
+  'production-intelligence',
+  'distribution-promotion',
+  'pre-visualization',
+];
+
+const unifiedGenerate = {
+  body: Joi.object({
+    module: Joi.string().required().valid(...VALID_MODULES)
+      .messages({
+        'any.only': `Module must be one of: ${VALID_MODULES.join(', ')}`,
+      }),
+    task: Joi.string().required().trim().min(2).max(100),
+    input: Joi.alternatives().try(
+      Joi.string().min(3).max(50000).trim(),
+      Joi.object(),
+    ).required()
+      .messages({
+        'alternatives.match': 'Input must be a string prompt or an object with structured data',
+      }),
+    options: Joi.object({
+      genre: Joi.string().max(100).trim(),
+      tone: Joi.string().max(100).trim(),
+      format: Joi.string().max(100).trim(),
+      style: Joi.string().max(100).trim(),
+      mood: Joi.string().max(100).trim(),
+      duration: Joi.string().max(100).trim(),
+      budget: Joi.string().max(200).trim(),
+      platform: Joi.string().max(50).trim(),
+      audience: Joi.string().max(200).trim(),
+      language: Joi.string().max(50).trim(),
+      location: Joi.string().max(200).trim(),
+      scale: Joi.string().valid('student', 'independent', 'mid-budget', 'studio'),
+      projectType: Joi.string().valid(
+        'short_film', 'feature_film', 'documentary', 'web_series',
+        'music_video', 'commercial', 'animation',
+      ),
+      characters: Joi.alternatives().try(
+        Joi.string().max(5000),
+        Joi.array().items(Joi.object()),
+      ),
+      provider: Joi.string().valid('openai', 'gemini'),
+      // Allow arbitrary extra options for flexibility
+    }).unknown(true).default({}),
+  }),
+};
+
+// ═══════════════════════════════════════════════════════════
+// ═  LEGACY ENDPOINT VALIDATIONS
+// ═══════════════════════════════════════════════════════════
 
 const generateScript = {
   body: Joi.object({
@@ -102,6 +162,9 @@ const getJobStatus = {
 };
 
 module.exports = {
+  // Unified
+  unifiedGenerate,
+  // Legacy
   generateScript,
   enhanceStory,
   analyzeGenre,

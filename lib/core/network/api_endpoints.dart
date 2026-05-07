@@ -79,6 +79,14 @@ class ApiEndpoints {
       '/media/project/$projectId';
 
   // ── AI ─────────────────────────────────────────────────────
+
+  /// Centralized AI generation endpoint
+  static const String aiGenerate = '/ai/generate';
+  static const String aiCapabilities = '/ai/capabilities';
+  static const String aiModules = '/ai/modules';
+  static String aiModuleTasks(String module) => '/ai/modules/$module/tasks';
+
+  /// Legacy endpoints (backward compatible)
   static const String generateScript = '/ai/generate-script';
   static const String enhanceStory = '/ai/enhance-story';
   static const String analyzeGenre = '/ai/analyze-genre';
