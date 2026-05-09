@@ -71,6 +71,14 @@ function normalizePhone(phone) {
   return phone.trim();
 }
 
+// --- ROOT ROUTE ---
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "CineHub backend running"
+  });
+});
+
 app.post('/send-otp', async (req, res) => {
   try {
     const { phone } = req.body;
