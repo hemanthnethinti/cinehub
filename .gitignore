@@ -1,4 +1,4 @@
-# Miscellaneous
+# ─── Miscellaneous ────────────────────────────────────────────
 *.class
 *.log
 *.pyc
@@ -12,40 +12,46 @@
 .swiftpm/
 migrate_working_dir/
 
-# IntelliJ related
+# ─── IntelliJ ─────────────────────────────────────────────────
 *.iml
 *.ipr
 *.iws
 .idea/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
+# ─── VS Code ──────────────────────────────────────────────────
+# .vscode/ is intentionally NOT ignored so workspace settings
+# are version-controlled alongside the monorepo.
+# Uncomment the line below to ignore it instead:
 #.vscode/
 
-# Flutter/Dart/Pub related
+# ─── Flutter / Dart / Pub ─────────────────────────────────────
 **/doc/api/
 **/ios/Flutter/.last_build_id
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.pub-cache/
-.pub/
-/build/
+frontend/.dart_tool/
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+frontend/.pub-cache/
+frontend/.pub/
+frontend/build/
 
-# Symbolication related
+# Symbolication
 app.*.symbols
 
-# Obfuscation related
+# Obfuscation
 app.*.map.json
 
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
+# Android Studio build artifacts
+frontend/android/app/debug
+frontend/android/app/profile
+frontend/android/app/release
 
-# Node modules
+# ─── Node.js ──────────────────────────────────────────────────
 node_modules/
 backend/node_modules/
-backend/node_modules_backup/
 backend/.env
+legacy/otp-server/node_modules/
+
+# ─── Environment files ────────────────────────────────────────
+# Never commit real .env files
+backend/.env
+*.env.local

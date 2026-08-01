@@ -35,7 +35,7 @@ echo ✓ npm !NPM_VERSION!
 REM Check if in server directory
 if not exist "package.json" (
   echo ❌ package.json not found
-  echo    Please run this from the 'server' directory
+  echo    Please run this from the 'backend' directory
   pause
   exit /b 1
 )

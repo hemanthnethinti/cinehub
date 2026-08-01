@@ -1,5 +1,5 @@
 {
-  "name": "cinehub-server",
+  "name": "cinehub-backend",
   "version": "1.0.0",
   "description": "CineHub AI — Production backend for AI-powered filmmaking ecosystem",
   "main": "src/index.js",
