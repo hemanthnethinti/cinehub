@@ -1,13 +1,67 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../shared/widgets/buttons/buttons.dart';
 import '../../../../shared/widgets/inputs/inputs.dart';
+import '../../providers/auth_provider.dart';
+import 'register_screen.dart';
 
-class LoginScreen extends StatelessWidget {
+/// Auth sign-in screen wired to [authProvider].
+///
+/// On successful login [AuthState.authenticated] is emitted and
+/// [CineHubApp] (in app.dart) automatically navigates to [MainScreen].
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends ConsumerState<LoginScreen> {
+  final _emailCtrl = TextEditingController();
+  final _passwordCtrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailCtrl.dispose();
+    _passwordCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _signIn() async {
+    final email = _emailCtrl.text.trim();
+    final password = _passwordCtrl.text;
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter your email and password.')),
+      );
+      return;
+    }
+    await ref.read(authProvider.notifier).login(email: email, password: password);
+    // Navigation is driven by authState change in CineHubApp (app.dart).
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+    final isLoading = authState.maybeWhen(loading: () => true, orElse: () => false);
+
+    // Show error snackbar on failed login.
+    ref.listen<AuthState>(authProvider, (_, next) {
+      next.mapOrNull(
+        error: (e) => WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(e.message),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
+        }),
+      );
+    });
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -37,18 +91,22 @@ class LoginScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.huge),
               // Form
-              const AppTextField(
+              AppTextField(
                 label: 'Email',
                 hint: 'you@example.com',
+                controller: _emailCtrl,
                 prefixIcon: Icons.email_outlined,
                 keyboardType: TextInputType.emailAddress,
+                enabled: !isLoading,
               ),
               const SizedBox(height: AppSpacing.lg),
-              const AppTextField(
+              AppTextField(
                 label: 'Password',
                 hint: '••••••••',
+                controller: _passwordCtrl,
                 prefixIcon: Icons.lock_outline,
                 obscureText: true,
+                enabled: !isLoading,
               ),
               const SizedBox(height: AppSpacing.sm),
               Align(
@@ -65,13 +123,19 @@ class LoginScreen extends StatelessWidget {
               PrimaryButton(
                 label: 'Sign In',
                 isExpanded: true,
-                onPressed: () {},
+                isLoading: isLoading,
+                onPressed: isLoading ? null : _signIn,
               ),
               const SizedBox(height: AppSpacing.lg),
               GhostButton(
                 label: 'Create Account',
                 isExpanded: true,
-                onPressed: () {},
+                onPressed: isLoading
+                    ? null
+                    : () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                        ),
               ),
               const SizedBox(height: AppSpacing.xxl),
               // Divider
@@ -113,3 +177,4 @@ class LoginScreen extends StatelessWidget {
     );
   }
 }
+

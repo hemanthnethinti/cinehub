@@ -1,32 +1,32 @@
-import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'features/auth/presentation/screens/login_screen.dart';
+import 'features/auth/providers/auth_provider.dart';
 import 'screens/main_screen.dart';
-import 'screens/auth/login_screen.dart';
-import 'screens/auth/signup_screen.dart';
 
-class CineHubApp extends StatelessWidget {
+/// Root application widget.
+///
+/// Watches [authProvider] and routes to the appropriate screen:
+/// - [MainScreen]  — when the user is authenticated.
+/// - [LoginScreen] — when the user is unauthenticated / initial.
+///
+/// [ProviderScope] is set up in main.dart.
+/// Navigation (GoRouter) will replace this once all features are migrated.
+class CineHubApp extends ConsumerWidget {
   const CineHubApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      useInheritedMediaQuery: true,
-      locale: DevicePreview.locale(context),
-      builder: DevicePreview.appBuilder,
       theme: ThemeData(brightness: Brightness.dark, fontFamily: 'Poppins'),
-      home: Builder(
-        builder: (context) => LoginScreen(
-          onLoggedIn: () {
-            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const MainScreen()));
-          },
-          onSignUpRequested: () {
-            Navigator.of(context).push(MaterialPageRoute(builder: (_) => SignupScreen(onSignedUp: (ctx) {
-                  Navigator.of(ctx).pushReplacement(MaterialPageRoute(builder: (_) => const MainScreen()));
-                })));
-          },
-        ),
+      home: authState.maybeWhen(
+        authenticated: (_) => const MainScreen(),
+        orElse: () => const LoginScreen(),
       ),
     );
   }
 }
+
