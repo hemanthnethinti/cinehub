@@ -1,44 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:cinehubapp/core/di/providers.dart';
 import 'package:cinehubapp/core/theme/app_colors.dart';
 import 'package:cinehubapp/core/theme/app_spacing.dart';
 import 'package:cinehubapp/core/theme/app_typography.dart';
+import 'package:cinehubapp/features/auth/presentation/providers/auth_notifier.dart';
+import 'package:cinehubapp/features/auth/presentation/providers/auth_providers.dart';
+import 'package:cinehubapp/features/auth/presentation/screens/forgot_password_screen.dart';
+import 'package:cinehubapp/features/auth/presentation/screens/login_screen.dart';
+import 'package:cinehubapp/features/auth/presentation/screens/register_screen.dart';
+import 'package:cinehubapp/features/auth/presentation/screens/splash_screen.dart';
 import 'routes.dart';
 
-// ── Placeholder screens (Phase 2 only) ───────────────────────────────────
-// These will be replaced in Phase 3 (Auth) and subsequent phases.
-// They are minimal scaffolds to confirm routing works end-to-end.
 
-class _SplashScreen extends StatelessWidget {
-  const _SplashScreen();
-  @override
-  Widget build(BuildContext context) => const Scaffold(
-        backgroundColor: AppColors.background,
-        body: Center(child: CircularProgressIndicator(color: AppColors.primary)),
-      );
-}
-
-class _LoginScreen extends StatelessWidget {
-  const _LoginScreen();
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        backgroundColor: AppColors.background,
-        body: Center(
-          child: Text('Login — Phase 3', style: AppTypography.headlineMedium),
-        ),
-      );
-}
+// ═══════════════════════════════════════════════════════════════
+//  PLACEHOLDER SHELL SCREENS (Phase 2 → replaced per phase)
+// ═══════════════════════════════════════════════════════════════
 
 class _HomeScreen extends StatelessWidget {
   const _HomeScreen();
   @override
   Widget build(BuildContext context) => Scaffold(
         backgroundColor: AppColors.background,
-        body: Center(
-          child: Text('Home — Phase 4', style: AppTypography.headlineMedium),
-        ),
+        body: Center(child: Text('Home — Phase 4', style: AppTypography.headlineMedium)),
       );
 }
 
@@ -47,9 +31,7 @@ class _DiscoverScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         backgroundColor: AppColors.background,
-        body: Center(
-          child: Text('Discover — Phase 6', style: AppTypography.headlineMedium),
-        ),
+        body: Center(child: Text('Discover — Phase 6', style: AppTypography.headlineMedium)),
       );
 }
 
@@ -58,9 +40,7 @@ class _ProjectsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         backgroundColor: AppColors.background,
-        body: Center(
-          child: Text('Projects — Phase 5', style: AppTypography.headlineMedium),
-        ),
+        body: Center(child: Text('Projects — Phase 5', style: AppTypography.headlineMedium)),
       );
 }
 
@@ -69,24 +49,43 @@ class _MessagesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         backgroundColor: AppColors.background,
-        body: Center(
-          child: Text('Messages — Phase 7', style: AppTypography.headlineMedium),
-        ),
+        body: Center(child: Text('Messages — Phase 7', style: AppTypography.headlineMedium)),
       );
 }
 
-class _ProfileScreen extends StatelessWidget {
+class _ProfileScreen extends ConsumerWidget {
   const _ProfileScreen();
   @override
-  Widget build(BuildContext context) => Scaffold(
-        backgroundColor: AppColors.background,
-        body: Center(
-          child: Text('Profile — Phase 3', style: AppTypography.headlineMedium),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = (ref.watch(authNotifierProvider) as AuthAuthenticated?)?.user;
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Profile — Phase 3', style: AppTypography.headlineMedium),
+            if (user != null) ...[
+              const SizedBox(height: AppSpacing.lg),
+              Text(user.fullName, style: AppTypography.bodyLarge),
+              Text(user.email, style: AppTypography.bodySmall),
+              const SizedBox(height: AppSpacing.xl),
+              TextButton.icon(
+                icon: const Icon(Icons.logout_rounded, size: 18),
+                label: const Text('Logout'),
+                onPressed: () => ref.read(authNotifierProvider.notifier).logout(),
+              ),
+            ],
+          ],
         ),
-      );
+      ),
+    );
+  }
 }
 
-// ── App Shell ─────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+//  APP SHELL
+// ═══════════════════════════════════════════════════════════════
 
 class _AppShell extends StatelessWidget {
   const _AppShell({required this.navigationShell});
@@ -115,52 +114,74 @@ class _AppShell extends StatelessWidget {
       );
 }
 
-// ── Router Provider ───────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+//  ROUTER PROVIDER
+// ═══════════════════════════════════════════════════════════════
 
-/// Provides the configured [GoRouter] instance.
+/// The application router, now wired to [authNotifierProvider].
 ///
-/// The router is a [Provider] (not [FutureProvider]) because all async
-/// initialization (SharedPreferences, SecureStorage) is done in [main]
-/// before [runApp] is called.
+/// Auth redirect strategy (Phase 3):
+/// - [AuthInitial] / [AuthLoading] → stay on splash (no redirect)
+/// - [AuthAuthenticated]            → redirect away from auth screens
+/// - [AuthUnauthenticated]          → redirect to login from protected routes
 ///
-/// Auth guard: if no stored session exists → redirect to [Routes.login].
-/// In Phase 3, this will read from [authNotifierProvider] instead.
+/// Protected routes are everything EXCEPT /splash, /login, /register,
+/// /forgot-password.
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final storage = ref.watch(secureStorageProvider);
-
   return GoRouter(
     initialLocation: Routes.splash,
     debugLogDiagnostics: true,
+    refreshListenable: _AuthChangeNotifier(ref),
     redirect: (context, state) async {
-      // Phase 2: minimal guard — checks stored token only.
-      // Phase 3: will replace this with authNotifierProvider.
-      final hasSession  = await storage.hasSession();
-      final onAuthRoute = state.matchedLocation == Routes.login ||
-          state.matchedLocation == Routes.register ||
-          state.matchedLocation == Routes.splash;
+      final authState = ref.read(authNotifierProvider);
+      final location = state.matchedLocation;
 
-      if (!hasSession && !onAuthRoute) return Routes.login;
-      if (hasSession && state.matchedLocation == Routes.splash) return Routes.home;
+      final isAuthRoute = location == Routes.login ||
+          location == Routes.register ||
+          location == Routes.forgotPassword ||
+          location == Routes.splash;
+
+      // While checking session — stay on splash.
+      if (authState is AuthInitial || authState is AuthLoading) {
+        return location == Routes.splash ? null : Routes.splash;
+      }
+
+      // Authenticated — push away from auth screens.
+      if (authState is AuthAuthenticated) {
+        if (isAuthRoute) return Routes.home;
+        return null;
+      }
+
+      // Unauthenticated — protect app routes.
+      if (authState is AuthUnauthenticated || authState is AuthFailure) {
+        if (!isAuthRoute) return Routes.login;
+        return null;
+      }
+
       return null;
     },
     routes: [
-      // ── Splash ───────────────────────────────────────────────
+      // ── Splash ─────────────────────────────────────────────
       GoRoute(
         path: Routes.splash,
-        builder: (_, __) => const _SplashScreen(),
+        builder: (_, __) => const SplashScreen(),
       ),
 
-      // ── Auth ─────────────────────────────────────────────────
+      // ── Auth ───────────────────────────────────────────────
       GoRoute(
         path: Routes.login,
-        builder: (_, __) => const _LoginScreen(),
+        builder: (_, __) => const LoginScreen(),
       ),
       GoRoute(
         path: Routes.register,
-        builder: (_, __) => const _LoginScreen(), // Placeholder — Phase 3
+        builder: (_, __) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: Routes.forgotPassword,
+        builder: (_, __) => const ForgotPasswordScreen(),
       ),
 
-      // ── Shell (bottom nav) ───────────────────────────────────
+      // ── Shell (bottom nav) ─────────────────────────────────
       StatefulShellRoute.indexedStack(
         builder: (_, __, shell) => _AppShell(navigationShell: shell),
         branches: [
@@ -192,13 +213,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             const SizedBox(height: AppSpacing.lg),
             Text('Page not found', style: AppTypography.headlineMedium),
             const SizedBox(height: AppSpacing.sm),
-            Text(
-              state.matchedLocation,
-              style: AppTypography.bodySmall,
-            ),
+            Text(state.matchedLocation, style: AppTypography.bodySmall),
           ],
         ),
       ),
     ),
   );
 });
+
+/// [ChangeNotifier] that triggers router refresh when auth state changes.
+class _AuthChangeNotifier extends ChangeNotifier {
+  _AuthChangeNotifier(Ref ref) {
+    ref.listen<AuthState>(authNotifierProvider, (_, __) => notifyListeners());
+  }
+}

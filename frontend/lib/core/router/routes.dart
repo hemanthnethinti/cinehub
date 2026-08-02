@@ -3,9 +3,11 @@
 /// Always use these constants with [GoRouter] — never hardcode path strings.
 abstract final class Routes {
   // ── Auth ──────────────────────────────────────────────────────
-  static const String splash   = '/splash';
-  static const String login    = '/login';
-  static const String register = '/register';
+  static const String splash          = '/splash';
+  static const String login           = '/login';
+  static const String register        = '/register';
+  static const String forgotPassword  = '/forgot-password';
+
 
   // ── Shell (bottom nav tabs) ───────────────────────────────────
   static const String shell    = '/shell';
