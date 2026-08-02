@@ -1,157 +1,204 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:cinehubapp/core/di/providers.dart';
+import 'package:cinehubapp/core/theme/app_colors.dart';
+import 'package:cinehubapp/core/theme/app_spacing.dart';
+import 'package:cinehubapp/core/theme/app_typography.dart';
 import 'routes.dart';
-import '../../features/splash/presentation/screens/splash_screen.dart';
-import '../../features/auth/presentation/screens/login_screen.dart';
-import '../../features/home/presentation/screens/home_screen.dart';
-import '../../features/discover/presentation/screens/discover_screen.dart';
-import '../../features/opportunities/presentation/screens/jobs_screen.dart';
-import '../../features/profile/presentation/screens/profile_screen.dart';
-import '../../features/ai/presentation/screens/ai_hub_screen.dart';
-import '../../features/ai/presentation/screens/script_generator_screen.dart';
-import '../../features/ai/presentation/screens/cost_predictor_screen.dart';
-import '../../features/ai/presentation/screens/trailer_concept_screen.dart';
-import '../../features/portfolio/presentation/screens/portfolio_screen.dart';
-import '../../features/projects/presentation/screens/project_detail_screen.dart';
-import '../../features/discover/presentation/screens/creator_profile_screen.dart';
-import '../../features/opportunities/presentation/screens/job_detail_screen.dart';
-import '../../features/messaging/presentation/screens/conversations_screen.dart';
-import '../../features/messaging/presentation/screens/chat_screen.dart';
-import '../../features/profile/presentation/screens/edit_profile_screen.dart';
-import '../../features/profile/presentation/screens/settings_screen.dart';
-import '../../shared/widgets/layout/app_shell.dart';
 
-final GlobalKey<NavigatorState> _rootNavigatorKey =
-    GlobalKey<NavigatorState>(debugLabel: 'root');
-final GlobalKey<NavigatorState> _shellNavigatorKey =
-    GlobalKey<NavigatorState>(debugLabel: 'shell');
+// ── Placeholder screens (Phase 2 only) ───────────────────────────────────
+// These will be replaced in Phase 3 (Auth) and subsequent phases.
+// They are minimal scaffolds to confirm routing works end-to-end.
 
-/// CineHub router configuration.
+class _SplashScreen extends StatelessWidget {
+  const _SplashScreen();
+  @override
+  Widget build(BuildContext context) => const Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+      );
+}
+
+class _LoginScreen extends StatelessWidget {
+  const _LoginScreen();
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(
+          child: Text('Login — Phase 3', style: AppTypography.headlineMedium),
+        ),
+      );
+}
+
+class _HomeScreen extends StatelessWidget {
+  const _HomeScreen();
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(
+          child: Text('Home — Phase 4', style: AppTypography.headlineMedium),
+        ),
+      );
+}
+
+class _DiscoverScreen extends StatelessWidget {
+  const _DiscoverScreen();
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(
+          child: Text('Discover — Phase 6', style: AppTypography.headlineMedium),
+        ),
+      );
+}
+
+class _ProjectsScreen extends StatelessWidget {
+  const _ProjectsScreen();
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(
+          child: Text('Projects — Phase 5', style: AppTypography.headlineMedium),
+        ),
+      );
+}
+
+class _MessagesScreen extends StatelessWidget {
+  const _MessagesScreen();
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(
+          child: Text('Messages — Phase 7', style: AppTypography.headlineMedium),
+        ),
+      );
+}
+
+class _ProfileScreen extends StatelessWidget {
+  const _ProfileScreen();
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(
+          child: Text('Profile — Phase 3', style: AppTypography.headlineMedium),
+        ),
+      );
+}
+
+// ── App Shell ─────────────────────────────────────────────────────────────
+
+class _AppShell extends StatelessWidget {
+  const _AppShell({required this.navigationShell});
+  final StatefulNavigationShell navigationShell;
+
+  static const _tabs = [
+    NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home_rounded), label: 'Home'),
+    NavigationDestination(icon: Icon(Icons.explore_outlined), selectedIcon: Icon(Icons.explore_rounded), label: 'Discover'),
+    NavigationDestination(icon: Icon(Icons.movie_outlined), selectedIcon: Icon(Icons.movie_rounded), label: 'Projects'),
+    NavigationDestination(icon: Icon(Icons.chat_bubble_outline_rounded), selectedIcon: Icon(Icons.chat_bubble_rounded), label: 'Messages'),
+    NavigationDestination(icon: Icon(Icons.person_outline_rounded), selectedIcon: Icon(Icons.person_rounded), label: 'Profile'),
+  ];
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        backgroundColor: AppColors.background,
+        body: navigationShell,
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: navigationShell.currentIndex,
+          onDestinationSelected: (i) => navigationShell.goBranch(
+            i,
+            initialLocation: i == navigationShell.currentIndex,
+          ),
+          destinations: _tabs,
+        ),
+      );
+}
+
+// ── Router Provider ───────────────────────────────────────────────────────
+
+/// Provides the configured [GoRouter] instance.
 ///
-/// Uses ShellRoute to persist bottom navigation across tab switches.
-/// Starts with a cinematic splash screen on fresh launch.
-final GoRouter appRouter = GoRouter(
-  navigatorKey: _rootNavigatorKey,
-  initialLocation: Routes.splash,
-  debugLogDiagnostics: true,
-  routes: [
-    // ── Splash (full-screen, no shell) ─────────────────────────
-    GoRoute(
-      path: Routes.splash,
-      builder: (context, state) => const SplashScreen(),
-    ),
+/// The router is a [Provider] (not [FutureProvider]) because all async
+/// initialization (SharedPreferences, SecureStorage) is done in [main]
+/// before [runApp] is called.
+///
+/// Auth guard: if no stored session exists → redirect to [Routes.login].
+/// In Phase 3, this will read from [authNotifierProvider] instead.
+final appRouterProvider = Provider<GoRouter>((ref) {
+  final storage = ref.watch(secureStorageProvider);
 
-    // ── Auth (full-screen, no shell) ─────────────────────────
-    GoRoute(
-      path: Routes.login,
-      builder: (context, state) => const LoginScreen(),
-    ),
+  return GoRouter(
+    initialLocation: Routes.splash,
+    debugLogDiagnostics: true,
+    redirect: (context, state) async {
+      // Phase 2: minimal guard — checks stored token only.
+      // Phase 3: will replace this with authNotifierProvider.
+      final hasSession  = await storage.hasSession();
+      final onAuthRoute = state.matchedLocation == Routes.login ||
+          state.matchedLocation == Routes.register ||
+          state.matchedLocation == Routes.splash;
 
-    // ── Main App Shell (bottom nav) ──────────────────────────
-    ShellRoute(
-      navigatorKey: _shellNavigatorKey,
-      builder: (context, state, child) => AppShell(child: child),
-      routes: [
-        GoRoute(
-          path: Routes.home,
-          pageBuilder: (context, state) => const NoTransitionPage(
-            child: HomeScreen(),
-          ),
-        ),
-        GoRoute(
-          path: Routes.discover,
-          pageBuilder: (context, state) => const NoTransitionPage(
-            child: DiscoverScreen(),
-          ),
-        ),
-        GoRoute(
-          path: Routes.aiHub,
-          pageBuilder: (context, state) => const NoTransitionPage(
-            child: AIHubScreen(),
-          ),
-        ),
-        GoRoute(
-          path: Routes.opportunities,
-          pageBuilder: (context, state) => const NoTransitionPage(
-            child: JobsScreen(),
-          ),
-        ),
-        GoRoute(
-          path: Routes.profile,
-          pageBuilder: (context, state) => const NoTransitionPage(
-            child: ProfileScreen(),
-          ),
-        ),
-      ],
-    ),
+      if (!hasSession && !onAuthRoute) return Routes.login;
+      if (hasSession && state.matchedLocation == Routes.splash) return Routes.home;
+      return null;
+    },
+    routes: [
+      // ── Splash ───────────────────────────────────────────────
+      GoRoute(
+        path: Routes.splash,
+        builder: (_, __) => const _SplashScreen(),
+      ),
 
-    // ── Detail screens (pushed on top of shell) ──────────────
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey,
-      path: Routes.projectDetail,
-      builder: (context, state) => ProjectDetailScreen(
-        projectId: state.pathParameters['id']!,
+      // ── Auth ─────────────────────────────────────────────────
+      GoRoute(
+        path: Routes.login,
+        builder: (_, __) => const _LoginScreen(),
+      ),
+      GoRoute(
+        path: Routes.register,
+        builder: (_, __) => const _LoginScreen(), // Placeholder — Phase 3
+      ),
+
+      // ── Shell (bottom nav) ───────────────────────────────────
+      StatefulShellRoute.indexedStack(
+        builder: (_, __, shell) => _AppShell(navigationShell: shell),
+        branches: [
+          StatefulShellBranch(routes: [
+            GoRoute(path: Routes.home, builder: (_, __) => const _HomeScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(path: Routes.discover, builder: (_, __) => const _DiscoverScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(path: Routes.projects, builder: (_, __) => const _ProjectsScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(path: Routes.messages, builder: (_, __) => const _MessagesScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(path: Routes.profile, builder: (_, __) => const _ProfileScreen()),
+          ]),
+        ],
+      ),
+    ],
+    errorBuilder: (context, state) => Scaffold(
+      backgroundColor: AppColors.background,
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline_rounded, color: AppColors.error, size: 48),
+            const SizedBox(height: AppSpacing.lg),
+            Text('Page not found', style: AppTypography.headlineMedium),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              state.matchedLocation,
+              style: AppTypography.bodySmall,
+            ),
+          ],
+        ),
       ),
     ),
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey,
-      path: Routes.creatorProfile,
-      builder: (context, state) => CreatorProfileScreen(
-        creatorId: state.pathParameters['id']!,
-      ),
-    ),
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey,
-      path: Routes.jobDetail,
-      builder: (context, state) => JobDetailScreen(
-        jobId: state.pathParameters['id']!,
-      ),
-    ),
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey,
-      path: Routes.portfolio,
-      builder: (context, state) => const PortfolioScreen(),
-    ),
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey,
-      path: Routes.editProfile,
-      builder: (context, state) => const EditProfileScreen(),
-    ),
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey,
-      path: Routes.conversations,
-      builder: (context, state) => const ConversationsScreen(),
-    ),
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey,
-      path: Routes.chat,
-      builder: (context, state) => ChatScreen(
-        conversationId: state.pathParameters['id']!,
-      ),
-    ),
-
-    // ── AI Sub-screens ───────────────────────────────────────
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey,
-      path: Routes.scriptGenerator,
-      builder: (context, state) => const ScriptGeneratorScreen(),
-    ),
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey,
-      path: Routes.costPredictor,
-      builder: (context, state) => const CostPredictorScreen(),
-    ),
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey,
-      path: Routes.trailerConcept,
-      builder: (context, state) => const TrailerConceptScreen(),
-    ),
-
-    // ── Settings ─────────────────────────────────────────────
-    GoRoute(
-      parentNavigatorKey: _rootNavigatorKey,
-      path: Routes.settings,
-      builder: (context, state) => const SettingsScreen(),
-    ),
-  ],
-);
+  );
+});

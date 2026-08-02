@@ -1,20 +1,46 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../config/app_config.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../network/api_client.dart';
+import '../storage/local_storage.dart';
+import '../storage/secure_storage.dart';
 
-/// ── Core DI Providers ──────────────────────────────────────
-///
-/// Single source of truth for app-wide dependencies.
-/// All feature providers depend on these.
+// ── Platform Services ───────────────────────────────────────────
 
-/// Application configuration provider.
-final appConfigProvider = Provider<AppConfig>((ref) {
-  return AppConfig.fromEnvironment();
-});
+/// Raw [FlutterSecureStorage] instance.
+/// Use [secureStorageProvider] instead of accessing this directly.
+final _flutterSecureStorageProvider = Provider<FlutterSecureStorage>(
+  (_) => const FlutterSecureStorage(
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+  ),
+  name: 'FlutterSecureStorage',
+);
 
-/// Singleton API client — shared across all data sources.
-final apiClientProvider = Provider<ApiClient>((ref) {
-  final config = ref.watch(appConfigProvider);
-  return ApiClient(config: config);
-});
+/// [SharedPreferences] must be initialized before the app starts.
+/// Override this in [ProviderScope] after awaiting [SharedPreferences.getInstance].
+final sharedPreferencesProvider = Provider<SharedPreferences>(
+  (_) => throw UnimplementedError('Override sharedPreferencesProvider in ProviderScope'),
+  name: 'SharedPreferences',
+);
+
+// ── Storage ─────────────────────────────────────────────────────
+
+/// Secure token storage.
+final secureStorageProvider = Provider<SecureStorage>(
+  (ref) => SecureStorage(ref.watch(_flutterSecureStorageProvider)),
+  name: 'SecureStorage',
+);
+
+/// Non-sensitive preference storage.
+final localStorageProvider = Provider<LocalStorage>(
+  (ref) => LocalStorage(ref.watch(sharedPreferencesProvider)),
+  name: 'LocalStorage',
+);
+
+// ── Network ─────────────────────────────────────────────────────
+
+/// The single [ApiClient] instance. All repositories use this.
+final apiClientProvider = Provider<ApiClient>(
+  (ref) => ApiClient(storage: ref.watch(secureStorageProvider)),
+  name: 'ApiClient',
+);

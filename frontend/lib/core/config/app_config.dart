@@ -1,72 +1,30 @@
-/// Environment configuration for CineHub.
+import 'environment.dart';
+
+/// Application-wide configuration resolved from the compile-time environment.
 ///
-/// Use `--dart-define=ENV=dev` to switch environments at build time.
-/// Supports dev (local backend), staging, and production.
-enum Environment { dev, staging, prod }
+/// To switch environment, pass `--dart-define=ENV=production` to `flutter run`.
+/// Default is [Environment.development].
+abstract final class AppConfig {
+  static const String _env = String.fromEnvironment('ENV', defaultValue: 'development');
 
-class AppConfig {
-  final Environment environment;
-  final String apiBaseUrl;
-  final String geminiApiKey;
-  final bool enableAnalytics;
-  final bool enableLogging;
-  final Duration apiTimeout;
+  static Environment get environment => switch (_env) {
+        'production' => Environment.production,
+        'staging'    => Environment.staging,
+        _            => Environment.development,
+      };
 
-  const AppConfig._({
-    required this.environment,
-    required this.apiBaseUrl,
-    required this.geminiApiKey,
-    required this.enableAnalytics,
-    required this.enableLogging,
-    required this.apiTimeout,
-  });
+  static bool get isDev  => environment == Environment.development;
+  static bool get isProd => environment == Environment.production;
 
-  factory AppConfig.fromEnvironment() {
-    const env = String.fromEnvironment('ENV', defaultValue: 'dev');
-    switch (env) {
-      case 'prod':
-        return AppConfig.prod();
-      case 'staging':
-        return AppConfig.staging();
-      default:
-        return AppConfig.dev();
-    }
-  }
+  static String get baseUrl => switch (environment) {
+        Environment.production  => 'https://api.cinehub.app',
+        Environment.staging     => 'https://api-staging.cinehub.app',
+        Environment.development => 'http://10.0.2.2:4000', // Android emulator → localhost
+      };
 
-  /// Local development — points to local Node.js backend.
-  factory AppConfig.dev() => const AppConfig._(
-        environment: Environment.dev,
-        apiBaseUrl: 'https://cinehub-qltm.onrender.com',
-        geminiApiKey: String.fromEnvironment(
-          'GEMINI_KEY',
-          defaultValue: '',
-        ),
-        enableAnalytics: false,
-        enableLogging: true,
-        apiTimeout: Duration(seconds: 30),
-      );
+  static String get socketUrl => baseUrl;
 
-  /// Staging — deployed test backend.
-  factory AppConfig.staging() => const AppConfig._(
-        environment: Environment.staging,
-        apiBaseUrl: 'https://cinehub-qltm.onrender.com',
-        geminiApiKey: String.fromEnvironment('GEMINI_KEY', defaultValue: ''),
-        enableAnalytics: true,
-        enableLogging: true,
-        apiTimeout: Duration(seconds: 20),
-      );
+  static String get apiVersion => 'v1';
 
-  /// Production — live backend.
-  factory AppConfig.prod() => const AppConfig._(
-        environment: Environment.prod,
-        apiBaseUrl: 'https://cinehub-qltm.onrender.com',
-        geminiApiKey: String.fromEnvironment('GEMINI_KEY', defaultValue: ''),
-        enableAnalytics: true,
-        enableLogging: false,
-        apiTimeout: Duration(seconds: 15),
-      );
-
-  bool get isDev => environment == Environment.dev;
-  bool get isProd => environment == Environment.prod;
-  bool get isStaging => environment == Environment.staging;
+  static String get apiBase => '$baseUrl/api/$apiVersion';
 }
