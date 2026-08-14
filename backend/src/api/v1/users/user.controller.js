@@ -16,6 +16,11 @@ const updateProfile = catchAsync(async (req, res) => {
   ApiResponse.ok(user, 'Profile updated').send(res);
 });
 
+const deactivateAccount = catchAsync(async (req, res) => {
+  await userService.deactivateAccount(req.user._id);
+  ApiResponse.ok(null, 'Account deactivated').send(res);
+});
+
 const listUsers = catchAsync(async (req, res) => {
   const filter = pick(req.query, ['search', 'role', 'skill']);
   const options = pick(req.query, ['page', 'limit', 'sortBy']);
@@ -45,4 +50,13 @@ const getFollowing = catchAsync(async (req, res) => {
   ApiResponse.paginated(result.docs, result.pagination).send(res);
 });
 
-module.exports = { getUser, updateProfile, listUsers, followUser, unfollowUser, getFollowers, getFollowing };
+module.exports = {
+  getUser,
+  updateProfile,
+  deactivateAccount,
+  listUsers,
+  followUser,
+  unfollowUser,
+  getFollowers,
+  getFollowing,
+};

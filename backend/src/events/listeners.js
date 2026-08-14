@@ -8,7 +8,7 @@ const { logger } = require('../config');
 function registerListeners() {
   // ── User Events ─────────────────────────────
 
-  emitter.on('user:registered', async ({ userId, email }) => {
+  emitter.on('user:registered', async ({ email }) => {
     logger.info(`[Listener] New user registered: ${email}`);
     // TODO: Send welcome email, trigger email verification
   });
@@ -36,7 +36,7 @@ function registerListeners() {
     }
   });
 
-  emitter.on('user:forgotPassword', async ({ userId, email, resetToken }) => {
+  emitter.on('user:forgotPassword', async ({ email }) => {
     logger.info(`[Listener] Password reset requested for: ${email}`);
     // TODO: Send password reset email with resetToken
   });
@@ -52,7 +52,7 @@ function registerListeners() {
     // TODO: Update user's project count
   });
 
-  emitter.on('project:deleted', async ({ projectId, ownerId }) => {
+  emitter.on('project:deleted', async ({ projectId }) => {
     logger.info(`[Listener] Project deleted: ${projectId}`);
   });
 
@@ -82,7 +82,7 @@ function registerListeners() {
 
   // ── Script Events ───────────────────────────
 
-  emitter.on('script:aiGenerated', async ({ scriptId, userId, projectId }) => {
+  emitter.on('script:aiGenerated', async ({ scriptId, projectId }) => {
     logger.info(`[Listener] AI script generated: ${scriptId} for project ${projectId}`);
   });
 

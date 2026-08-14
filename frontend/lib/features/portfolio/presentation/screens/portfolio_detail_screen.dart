@@ -28,7 +28,7 @@ class PortfolioDetailScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_rounded),
-            onPressed: () => context.pushNamed(Routes.portfolioEditor, pathParameters: {'id': id}),
+            onPressed: () => context.push(Routes.portfolioEditorPath(id)),
           ),
           IconButton(
             icon: const Icon(Icons.delete_rounded, color: AppColors.error),

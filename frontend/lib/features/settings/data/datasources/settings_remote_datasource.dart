@@ -11,14 +11,14 @@ class SettingsRemoteDataSource {
 
   Future<void> updateSettings(Map<String, dynamic> preferences) async {
     await _client.patch(
-      '/users/profile',
+      'users/profile',
       data: {'preferences': preferences},
     );
   }
 
   Future<void> changePassword(String currentPassword, String newPassword) async {
     await _client.post(
-      '/auth/change-password',
+      'auth/change-password',
       data: {
         'currentPassword': currentPassword,
         'newPassword': newPassword,
@@ -27,7 +27,6 @@ class SettingsRemoteDataSource {
   }
 
   Future<void> deleteAccount() async {
-    // Missing backend support
-    throw UnimplementedError('Delete account endpoint does not exist yet');
+    await _client.delete('users/me');
   }
 }

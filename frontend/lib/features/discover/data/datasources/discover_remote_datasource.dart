@@ -24,7 +24,7 @@ class DiscoverRemoteDataSource {
     int limit = 20,
   }) async {
     final response = await _client.get<Map<String, dynamic>>(
-      '/projects',
+      'projects',
       queryParameters: {
         'search': query,
         'page': page,

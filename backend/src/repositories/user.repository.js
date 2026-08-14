@@ -8,7 +8,9 @@ class UserRepository extends BaseRepository {
   constructor() { super(User); }
 
   async findByEmail(email) {
-    return this.model.findOne({ email: email.toLowerCase() });
+    return this.model
+      .findOne({ email: email.toLowerCase() })
+      .select('+password +refreshToken');
   }
 
   async findBySlug(slug) {

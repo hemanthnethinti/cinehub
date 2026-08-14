@@ -8,6 +8,12 @@ const getConversations = {
   }),
 };
 
+const createConversation = {
+  body: Joi.object().keys({
+    participantId: Joi.objectId().required(),
+  }),
+};
+
 const getMessages = {
   params: Joi.object().keys({
     id: Joi.objectId().required(),
@@ -36,6 +42,7 @@ const markAsRead = {
 
 module.exports = {
   getConversations,
+  createConversation,
   getMessages,
   sendMessage,
   markAsRead,

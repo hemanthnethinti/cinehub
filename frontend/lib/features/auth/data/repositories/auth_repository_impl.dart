@@ -75,9 +75,18 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Result<void>> logout() async {
-    // Always clear local storage first, even if backend call fails.
-    await _storage.clearAll();
-    return _executeVoid(() => _dataSource.logout());
+    // Keep the access token long enough for the authenticated logout request.
+    // Local credentials are still cleared when the server is unavailable.
+    try {
+      await _dataSource.logout();
+      return Result.success(null);
+    } on DioException catch (e) {
+      return Result.failure(_mapDioError(e));
+    } catch (e) {
+      return Result.failure(AppError.unknown(message: e.toString()));
+    } finally {
+      await _storage.clearAll();
+    }
   }
 
   // ── Get Me ────────────────────────────────────────────────────

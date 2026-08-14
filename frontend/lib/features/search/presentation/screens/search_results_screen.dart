@@ -108,7 +108,7 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> with 
       ),
       title: Text(user.fullName),
       subtitle: Text(user.headline ?? 'Creator'),
-      onTap: () => context.push(Routes.creatorProfilePath(user.id)),
+      onTap: () => context.push(Routes.userProfilePath(user.id)),
     );
   }
 
@@ -138,7 +138,7 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> with 
       ),
       title: Text(portfolio.title),
       subtitle: Text(portfolio.category),
-      onTap: () => context.push('/portfolio/detail/${portfolio.id}'),
+      onTap: () => context.push(Routes.portfolioDetailPath(portfolio.id)),
     );
   }
 }

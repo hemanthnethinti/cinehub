@@ -32,7 +32,7 @@ class ConversationRepository extends BaseRepository {
     const mergedOptions = {
       ...options,
       populate: [
-        { path: 'participants', select: 'firstName lastName email profilePicture' },
+        { path: 'participants', select: 'firstName lastName email avatar headline' },
         { path: 'latestMessage' },
       ],
       sort: { updatedAt: -1 },

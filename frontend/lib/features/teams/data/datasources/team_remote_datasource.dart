@@ -14,7 +14,7 @@ class TeamRemoteDataSource {
   }
 
   Future<List<Map<String, dynamic>>> searchUsers(String query) async {
-    final response = await _client.get<Map<String, dynamic>>('/users', queryParameters: {'search': query, 'limit': 10});
+    final response = await _client.get<Map<String, dynamic>>('users', queryParameters: {'search': query, 'limit': 10});
     // Backend uses ApiResponse.paginated → data is a flat array under 'data' key
     final data = response.data?['data'] as List<dynamic>? ?? [];
     return data.cast<Map<String, dynamic>>();

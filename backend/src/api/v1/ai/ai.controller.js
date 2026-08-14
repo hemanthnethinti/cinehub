@@ -4,7 +4,6 @@
  * All AI features route through this single controller using workflow orchestration.
  */
 const { getWorkflowExecutor, workflowRegistry } = require('../../../integrations/ai');
-const { logger } = require('../../../config');
 
 class AIController {
   /**

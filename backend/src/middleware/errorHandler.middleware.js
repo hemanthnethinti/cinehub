@@ -4,7 +4,6 @@
  * Normalizes all errors into consistent ApiError shape.
  * Handles Mongoose errors, JWT errors, Multer errors, and unknown errors.
  */
-const httpStatus = require('http-status');
 const mongoose = require('mongoose');
 
 const { env, logger } = require('../config');

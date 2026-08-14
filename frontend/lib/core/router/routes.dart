@@ -70,5 +70,7 @@ abstract final class Routes {
   static String projectDetailPath(String id) => '/projects/$id';
   static String chatPath(String id)           => '/messages/$id';
   static String creatorProfilePath(String id) => '/discover/$id';
-  static String portfolioPath(String id)      => '/portfolio/$id';
+  static String portfolioPath(String id) => '/portfolio/$id';
+  static String portfolioDetailPath(String id) => '/portfolio/detail/$id';
+  static String portfolioEditorPath(String id) => '/portfolio/edit/$id';
 }
