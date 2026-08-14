@@ -22,8 +22,11 @@ final class ConversationDto {
       participants: (json['participants'] as List<dynamic>? ?? [])
           .map((e) => ProfileDto.fromJson(e as Map<String, dynamic>))
           .toList(),
-      lastMessage: json['lastMessage'] != null
-          ? MessageDto.fromJson(json['lastMessage'] as Map<String, dynamic>)
+      lastMessage: (json['lastMessage'] ?? json['latestMessage']) != null
+          ? MessageDto.fromJson(
+              (json['lastMessage'] ?? json['latestMessage'])
+                  as Map<String, dynamic>,
+            )
           : null,
       unreadCount: _extractUnreadCount(json),
       updatedAt: json['updatedAt'] as String? ?? DateTime.now().toIso8601String(),
@@ -66,7 +69,10 @@ final class MessageDto {
       conversationId: json['conversationId'] as String? ?? json['conversation'] as String? ?? '',
       senderId: _extractId(json['senderId'] ?? json['sender']),
       content: json['content'] as String? ?? json['text'] as String? ?? '',
-      mediaUrl: json['mediaUrl'] as String?,
+      mediaUrl: json['mediaUrl'] as String? ??
+          ((json['attachments'] as List<dynamic>?)?.isNotEmpty ?? false
+              ? (json['attachments'] as List<dynamic>).first.toString()
+              : null),
       status: json['status'] as String? ?? 'sent',
       createdAt: json['createdAt'] as String? ?? DateTime.now().toIso8601String(),
     );

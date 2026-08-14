@@ -164,8 +164,12 @@ final class ProfilePageDto {
       profiles: docs,
       page: (pagination['page'] as num?)?.toInt() ?? 1,
       totalPages: (pagination['totalPages'] as num?)?.toInt() ?? 1,
-      total: (pagination['total'] as num?)?.toInt() ?? 0,
-      hasNext: pagination['hasNext'] as bool? ?? false,
+      total: (pagination['total'] as num? ?? pagination['totalDocs'] as num?)
+              ?.toInt() ??
+          0,
+      hasNext: pagination['hasNext'] as bool? ??
+          pagination['hasNextPage'] as bool? ??
+          false,
     );
   }
 

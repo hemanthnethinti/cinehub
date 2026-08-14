@@ -42,11 +42,19 @@ class UserService {
     if (currentUserId === targetUserId) throw ApiError.badRequest('Cannot follow yourself');
     const target = await userRepo.findById(targetUserId);
     if (!target) throw ApiError.notFound('User not found');
+    const isAlreadyFollowing = (target.followers || [])
+      .some((id) => id.toString() === currentUserId);
+    if (isAlreadyFollowing) return;
     await userRepo.addFollower(targetUserId, currentUserId);
     eventEmitter.emit('user:followed', { followerId: currentUserId, followedId: targetUserId });
   }
 
   async unfollowUser(currentUserId, targetUserId) {
+    const target = await userRepo.findById(targetUserId);
+    if (!target) throw ApiError.notFound('User not found');
+    const isFollowing = (target.followers || [])
+      .some((id) => id.toString() === currentUserId);
+    if (!isFollowing) return;
     await userRepo.removeFollower(targetUserId, currentUserId);
   }
 

@@ -99,6 +99,7 @@ class AIMonitor {
    * @param {string} templateId
    */
   logCacheEvent(type, templateId) {
+    logger.debug(`[AI Monitor] Cache ${type}: ${templateId}`);
     if (type === 'hit') {
       this._stats.cacheHits++;
     } else {

@@ -13,7 +13,11 @@ router.use(authenticate());
 
 router
   .route('/conversations')
-  .get(validate(messagingValidation.getConversations), messagingController.getConversations);
+  .get(validate(messagingValidation.getConversations), messagingController.getConversations)
+  .post(
+    validate(messagingValidation.createConversation),
+    messagingController.createConversation,
+  );
 
 router
   .route('/conversations/:id/messages')

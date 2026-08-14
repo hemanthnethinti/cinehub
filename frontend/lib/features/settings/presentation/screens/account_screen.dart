@@ -34,7 +34,7 @@ class AccountScreen extends ConsumerWidget {
                 SettingsTile(
                   icon: Icons.edit_outlined,
                   title: 'Edit Profile',
-                  onTap: () => context.pushNamed(Routes.editProfile),
+                  onTap: () => context.push(Routes.editProfile),
                 ),
                 SettingsTile(
                   icon: Icons.email_outlined,

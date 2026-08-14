@@ -4,8 +4,6 @@
  * Extracts Bearer token, verifies it, attaches user to req.user.
  * Supports optional authentication for public-with-bonus endpoints.
  */
-const httpStatus = require('http-status');
-
 const { env } = require('../config');
 const ApiError = require('../utils/ApiError');
 const { verifyToken, TOKEN_TYPES } = require('../utils/token');

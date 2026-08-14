@@ -22,7 +22,34 @@ cinehub/
 
 ## Quick Start
 
-### Frontend (Flutter)
+### 1. Start local infrastructure
+
+Docker is the easiest way to run the required MongoDB and Redis services:
+
+```bash
+docker compose up -d
+```
+
+### 2. Start the backend
+
+```bash
+cd backend
+cp .env.example .env
+npm ci
+npm run dev               # http://localhost:5000
+```
+
+The example environment is ready for local development. AI routes stay disabled
+until either `GEMINI_API_KEY` or `OPENAI_API_KEY` is configured; the rest of the
+API works without an AI key.
+
+Verify the server with:
+
+```bash
+curl http://localhost:5000/api/v1/health
+```
+
+### 3. Start the Flutter app
 
 ```bash
 cd frontend
@@ -30,18 +57,19 @@ flutter pub get
 flutter run
 ```
 
-> **Target platform:** Android (primary). All platform directories are preserved.
-
-### Backend (Node.js)
+The default development URL uses `http://10.0.2.2:5000`, the Android emulator's
+alias for the host machine. For a physical Android device, pass the computer's
+LAN address explicitly:
 
 ```bash
-cd backend
-cp .env.example .env      # fill in your values
-npm install
-npm run dev               # starts on PORT=5000 by default
+flutter run --dart-define=API_BASE_URL=http://192.168.1.20:5000
 ```
 
-> **Requirements:** Node.js ≥ 20, MongoDB, Redis
+For staging or production builds, also pass `--dart-define=ENV=staging` or
+`--dart-define=ENV=production`.
+
+> **Requirements:** Node.js ≥ 20, Flutter with Dart ≥ 3.8.1, Docker (or locally
+> installed MongoDB and Redis). Android is the primary app target.
 
 ---
 

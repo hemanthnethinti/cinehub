@@ -5,7 +5,6 @@
  */
 const { getPipelines, getOrchestrator, aiMonitor } = require('../../../integrations/ai');
 const scriptService = require('../scripts/script.service');
-const { logger } = require('../../../config');
 const emitter = require('../../../events/emitter');
 
 class AIService {

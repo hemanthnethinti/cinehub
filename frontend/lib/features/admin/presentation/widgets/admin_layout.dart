@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:cinehubapp/core/router/routes.dart';
 import 'package:cinehubapp/core/theme/app_colors.dart';
 
 class AdminLayout extends StatelessWidget {
@@ -126,7 +127,7 @@ class AdminSideNavigation extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.exit_to_app),
             title: const Text('Exit Admin'),
-            onTap: () => context.go('/'),
+            onTap: () => context.go(Routes.home),
           ),
           const SizedBox(height: 16),
         ],

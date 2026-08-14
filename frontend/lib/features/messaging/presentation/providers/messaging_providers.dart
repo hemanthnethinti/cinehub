@@ -5,6 +5,7 @@ import 'package:cinehubapp/features/messaging/data/repositories/messaging_reposi
 import 'package:cinehubapp/features/messaging/domain/entities/conversation.dart';
 import 'package:cinehubapp/features/messaging/domain/repositories/messaging_repository.dart';
 import 'package:cinehubapp/features/messaging/domain/usecases/messaging_usecases.dart';
+import 'package:cinehubapp/features/profile/domain/entities/profile.dart';
 
 // ── Data & Domain ────────────────────────────────────────────────────────────
 
@@ -18,6 +19,14 @@ final messagingRepositoryProvider = Provider<MessagingRepository>((ref) {
 
 final getConversationsUseCaseProvider = Provider<GetConversationsUseCase>((ref) {
   return GetConversationsUseCase(ref.watch(messagingRepositoryProvider));
+});
+
+final searchMessageUsersUseCaseProvider = Provider<SearchMessageUsersUseCase>((ref) {
+  return SearchMessageUsersUseCase(ref.watch(messagingRepositoryProvider));
+});
+
+final startConversationUseCaseProvider = Provider<StartConversationUseCase>((ref) {
+  return StartConversationUseCase(ref.watch(messagingRepositoryProvider));
 });
 
 final getMessagesUseCaseProvider = Provider<GetMessagesUseCase>((ref) {
@@ -35,6 +44,15 @@ final markAsReadUseCaseProvider = Provider<MarkAsReadUseCase>((ref) {
 // ── State ────────────────────────────────────────────────────────────────────
 
 final searchQueryProvider = StateProvider.autoDispose<String>((ref) => '');
+
+final messageUserSearchProvider =
+    FutureProvider.autoDispose.family<List<Profile>, String>((ref, query) async {
+  final result = await ref.watch(searchMessageUsersUseCaseProvider).call(query);
+  return result.when(
+    success: (profiles) => profiles,
+    failure: (error) => throw Exception(error.userMessage),
+  );
+});
 
 final conversationsProvider = AsyncNotifierProvider.autoDispose<ConversationsNotifier, List<Conversation>>(
   ConversationsNotifier.new,

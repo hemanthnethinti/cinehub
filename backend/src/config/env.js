@@ -27,6 +27,8 @@ dotenv.config({
   path: selectedEnvPath,
 });
 
+// Logger configuration depends on env, so startup diagnostics use console here.
+// eslint-disable-next-line no-console
 console.log(`🌍 Loaded environment: ${path.basename(selectedEnvPath)}`);
 
 
@@ -110,6 +112,7 @@ const { error, value: envVars } = envSchema.validate(process.env, {
 
 if (error) {
   const missing = error.details.map((d) => `  ✗ ${d.message}`).join('\n');
+  // eslint-disable-next-line no-console
   console.error(`\n⛔ Environment validation failed:\n${missing}\n`);
   process.exit(1);
 }

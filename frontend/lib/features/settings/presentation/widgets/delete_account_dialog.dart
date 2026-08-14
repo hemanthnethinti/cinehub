@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cinehubapp/core/theme/app_colors.dart';
 import 'package:cinehubapp/core/theme/app_typography.dart';
 import 'package:cinehubapp/features/settings/presentation/providers/settings_providers.dart';
+import 'package:cinehubapp/features/auth/presentation/providers/auth_providers.dart';
 import 'package:shimmer/shimmer.dart';
 
 class DeleteAccountDialog extends ConsumerStatefulWidget {
@@ -26,7 +27,7 @@ class _DeleteAccountDialogState extends ConsumerState<DeleteAccountDialog> {
     result.when(
       success: (_) {
         Navigator.of(context).pop();
-        // Typically would trigger logout or route change here
+        ref.read(authNotifierProvider.notifier).logout();
       },
       failure: (error) {
         Navigator.of(context).pop();
@@ -46,7 +47,8 @@ class _DeleteAccountDialogState extends ConsumerState<DeleteAccountDialog> {
       backgroundColor: AppColors.surfaceElevated,
       title: Text('Delete Account', style: AppTypography.headlineSmall.copyWith(color: AppColors.error)),
       content: const Text(
-        'This action is irreversible. All your data, projects, and connections will be permanently lost. Are you sure you want to proceed?',
+        'Your account will be deactivated and you will be signed out. '
+        'You will no longer appear to other CineHub users.',
         style: AppTypography.bodyMedium,
       ),
       actions: [
@@ -62,7 +64,7 @@ class _DeleteAccountDialogState extends ConsumerState<DeleteAccountDialog> {
                 highlightColor: Colors.white,
                 child: const Text('Deleting...'),
               )
-            : Text('Delete Permanently', style: AppTypography.bodyMedium.copyWith(color: AppColors.error)),
+            : Text('Deactivate Account', style: AppTypography.bodyMedium.copyWith(color: AppColors.error)),
         ),
       ],
     );

@@ -19,6 +19,41 @@ const getConversations = async (userId, options) => {
 };
 
 /**
+ * Creates a direct conversation or returns the existing one.
+ * @param {string} userId - Requesting user ID
+ * @param {string} participantId - Other participant's user ID
+ * @returns {Promise<Object>}
+ */
+const createConversation = async (userId, participantId) => {
+  if (userId === participantId) {
+    throw ApiError.badRequest('You cannot start a conversation with yourself');
+  }
+
+  const participant = await User.findById(participantId);
+  if (!participant || !participant.isActive) {
+    throw ApiError.notFound('User not found');
+  }
+
+  const participants = [userId, participantId];
+  let conversation = await conversationRepository.findByParticipants(participants);
+
+  if (!conversation) {
+    conversation = await conversationRepository.create({
+      participants,
+      createdBy: userId,
+      unreadCount: { [userId]: 0, [participantId]: 0 },
+    });
+  }
+
+  return conversationRepository.findById(conversation._id, {
+    populate: [
+      { path: 'participants', select: 'firstName lastName email avatar headline' },
+      { path: 'latestMessage' },
+    ],
+  });
+};
+
+/**
  * Get messages in a conversation
  * @param {string} userId - Requesting user ID
  * @param {string} conversationId - Conversation ID
@@ -92,7 +127,7 @@ const sendMessage = async (userId, conversationId, body) => {
   
   await conversationRepository.incrementUnreadCounts(conversation._id, otherParticipants);
 
-  return messageRepository.findById(message._id).populate('sender');
+  return messageRepository.findById(message._id, { populate: 'sender' });
 };
 
 /**
@@ -118,6 +153,7 @@ const markAsRead = async (userId, conversationId) => {
 
 module.exports = {
   getConversations,
+  createConversation,
   getMessages,
   sendMessage,
   markAsRead,

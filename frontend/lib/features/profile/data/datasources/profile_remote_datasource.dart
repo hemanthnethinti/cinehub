@@ -139,7 +139,7 @@ class ProfileRemoteDataSource {
       'file': await MultipartFile.fromFile(file.path),
     });
     final response = await _client.upload<Map<String, dynamic>>(
-      '/media/upload',
+      'media/upload',
       data: formData,
     );
     final rawUrl = response.data!['data']['url'] as String;

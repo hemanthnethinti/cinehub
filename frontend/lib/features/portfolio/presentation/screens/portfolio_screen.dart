@@ -28,7 +28,7 @@ class PortfolioScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.add_rounded),
             tooltip: 'Create Portfolio',
-            onPressed: () => context.pushNamed(Routes.portfolioEditor, pathParameters: {'id': 'new'}),
+            onPressed: () => context.push(Routes.portfolioEditorPath('new')),
           ),
         ],
       ),
@@ -41,7 +41,7 @@ class PortfolioScreen extends ConsumerWidget {
             onRefresh: () => ref.read(portfolioListProvider.notifier).refresh(),
             child: PortfolioGrid(
               items: items,
-              onItemTap: (item) => context.pushNamed(Routes.portfolioDetail, pathParameters: {'id': item.id}),
+              onItemTap: (item) => context.push(Routes.portfolioDetailPath(item.id)),
             ),
           );
         },

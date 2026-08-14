@@ -325,9 +325,10 @@ class AIValidator {
       switch (expectedType) {
         case 'string':
           return String(value);
-        case 'number':
+        case 'number': {
           const num = Number(value);
-          return isNaN(num) ? null : num;
+          return Number.isNaN(num) ? null : num;
+        }
         case 'array':
           return Array.isArray(value) ? value : [value];
         case 'object':

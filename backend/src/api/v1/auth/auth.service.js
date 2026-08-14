@@ -4,7 +4,12 @@
  */
 const { env } = require('../../../config');
 const ApiError = require('../../../utils/ApiError');
-const { generateAuthTokens, verifyToken, generateResetPasswordToken, generateVerifyEmailToken, TOKEN_TYPES } = require('../../../utils/token');
+const {
+  generateAuthTokens,
+  verifyToken,
+  generateResetPasswordToken,
+  TOKEN_TYPES,
+} = require('../../../utils/token');
 const userRepo = require('../../../repositories/user.repository');
 const eventEmitter = require('../../../events/emitter');
 
@@ -51,7 +56,10 @@ class AuthService {
       throw ApiError.unauthorized('Invalid token type', 'AUTH_WRONG_TOKEN_TYPE');
     }
 
-    const user = await userRepo.findById(decoded.sub, { lean: false });
+    const user = await userRepo.findById(decoded.sub, {
+      lean: false,
+      select: '+refreshToken',
+    });
     if (!user || user.refreshToken !== refreshToken) {
       throw ApiError.unauthorized('Invalid refresh token', 'AUTH_INVALID_REFRESH_TOKEN');
     }
@@ -91,18 +99,19 @@ class AuthService {
   }
 
   async changePassword(userId, currentPassword, newPassword) {
-    const user = await userRepo.findById(userId, { lean: false, select: '+password' });
+    const user = await userRepo.findById(userId, {
+      lean: false,
+      select: '+password +refreshToken',
+    });
     if (!user) throw ApiError.notFound('User not found');
 
-    // Re-fetch with password field
-    const userWithPwd = await require('../../../models/user.model').findById(userId);
-    if (!(await userWithPwd.comparePassword(currentPassword))) {
+    if (!(await user.comparePassword(currentPassword))) {
       throw ApiError.badRequest('Current password is incorrect', 'AUTH_WRONG_PASSWORD');
     }
 
-    userWithPwd.password = newPassword;
-    userWithPwd.refreshToken = null;
-    await userWithPwd.save();
+    user.password = newPassword;
+    user.refreshToken = null;
+    await user.save();
   }
 
   async verifyEmail(token) {

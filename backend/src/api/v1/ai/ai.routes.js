@@ -36,7 +36,7 @@ const aiService = require('./ai.service');
 const aiController = require('./ai.controller');
 const { authenticate, aiLimiter, validate } = require('../../../middleware');
 const validation = require('./ai.validation');
-const { logger } = require('../../../config');
+const { env, logger } = require('../../../config');
 
 const router = express.Router();
 
@@ -48,21 +48,23 @@ const router = express.Router();
  * POST /ai/test-generate
  * Test AI generation without authentication (development only)
  */
-router.post(
-  '/test-generate',
-  validate(validation.unifiedGenerate),
-  catchAsync(async (req, res) => {
-    logger.info(`[AI API] TEST generate: ${req.body.module}::${req.body.task}`);
+if (env.isDev) {
+  router.post(
+    '/test-generate',
+    validate(validation.unifiedGenerate),
+    catchAsync(async (req, res) => {
+      logger.info(`[AI API] TEST generate: ${req.body.module}::${req.body.task}`);
 
-    // Mock user for testing
-    req.user = { _id: 'test-user-123' };
-    req.requestId = req.id || 'test-req-' + Date.now();
+      // Mock user for local development only.
+      req.user = { _id: 'test-user-123' };
+      req.requestId = req.id || `test-req-${Date.now()}`;
 
-    const result = await aiController.generate(req);
+      const result = await aiController.generate(req);
 
-    ApiResponse.ok(result, 'AI generation successful').send(res);
-  }),
-);
+      ApiResponse.ok(result, 'AI generation successful').send(res);
+    }),
+  );
+}
 
 // All AI routes require authentication
 router.use(authenticate());
@@ -276,7 +278,7 @@ router.post(
   aiLimiter,
   validate(validation.projectInsights),
   catchAsync(async (req, res) => {
-    const { projectId, provider } = req.body;
+    const { provider } = req.body;
 
     // In production, fetch project data from DB. Placeholder for now.
     const result = await aiService.getProjectInsights({

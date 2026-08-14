@@ -10,6 +10,7 @@ const router = express.Router();
 
 router.get('/', authenticate(), validate(userValidation.listUsers), userController.listUsers);
 router.patch('/profile', authenticate(), validate(userValidation.updateProfile), userController.updateProfile);
+router.delete('/me', authenticate(), userController.deactivateAccount);
 router.get('/:id', validate(userValidation.getUser), userController.getUser);
 router.post('/:id/follow', authenticate(), userController.followUser);
 router.delete('/:id/follow', authenticate(), userController.unfollowUser);

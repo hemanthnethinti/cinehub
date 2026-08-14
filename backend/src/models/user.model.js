@@ -26,6 +26,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       minlength: 8,
+      select: false,
       private: true, // Excluded from toJSON
     },
     role: {
@@ -107,8 +108,8 @@ const userSchema = new mongoose.Schema(
       twitter: String,
     },
 
-    // ── Refresh Token (hashed) ──────────────────
-    refreshToken: { type: String, private: true },
+    // ── Refresh Token ───────────────────────────
+    refreshToken: { type: String, select: false, private: true },
   },
   {
     timestamps: true,
