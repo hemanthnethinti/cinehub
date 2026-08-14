@@ -169,15 +169,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           projectId: state.pathParameters['id']!,
         ),
       ),
+      // Keep the static path before `/messages/:id` so "new" is not
+      // interpreted as a conversation ID by GoRouter.
+      GoRoute(
+        path: Routes.newConversation,
+        builder: (context, state) => const NewConversationScreen(),
+      ),
       GoRoute(
         path: Routes.chat,
         builder: (context, state) => ChatScreen(
           conversationId: state.pathParameters['id']!,
         ),
-      ),
-      GoRoute(
-        path: Routes.newConversation,
-        builder: (context, state) => const NewConversationScreen(),
       ),
       GoRoute(
         path: Routes.portfolio,
