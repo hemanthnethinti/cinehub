@@ -58,6 +58,9 @@ dependencies:
   # File picker for video selection
   file_picker: ^8.0.0
 
+  # Image picker for avatar / gallery selection
+  image_picker: ^1.1.2
+
   # Video player for playback
   video_player: ^2.10.0
 

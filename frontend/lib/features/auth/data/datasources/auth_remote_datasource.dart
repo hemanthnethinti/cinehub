@@ -18,7 +18,7 @@ class AuthRemoteDataSource {
   const AuthRemoteDataSource(this._client);
   final ApiClient _client;
 
-  static const _base = '/auth';
+  static const _base = 'auth';
 
   Future<AuthResponseDto> login({
     required String email,

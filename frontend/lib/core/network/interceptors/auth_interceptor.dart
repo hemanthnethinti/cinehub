@@ -10,7 +10,7 @@ class AuthInterceptor extends Interceptor {
 
   final SecureStorage _storage;
 
-  static const _skipPaths = ['/auth/login', '/auth/register', '/auth/refresh'];
+  static const _skipPaths = ['auth/login', 'auth/register', 'auth/refresh-tokens', 'auth/forgot-password'];
 
   @override
   Future<void> onRequest(

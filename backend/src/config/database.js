@@ -29,30 +29,45 @@ const RETRY_DELAY_MS = 3000;
  * Uses mongodb-memory-server for test environments.
  * @returns {Promise<mongoose.Connection>}
  */
+/**
+ * Connects to MongoDB with retry logic.
+ * Uses mongodb-memory-server ONLY for automated tests.
+ */
 async function connectDatabase() {
-  let mongoUri = env.db.uri;
-  
-  // Start in-memory MongoDB for testing
-  if (env.isTest || !env.db.uri || env.db.uri.includes('localhost:27017')) {
+  let mongoUri;
+
+  if (env.isTest) {
     try {
       mongoServer = await MongoMemoryServer.create();
       mongoUri = mongoServer.getUri();
-      logger.info('[DB] 🔧 Starting mongodb-memory-server for testing...');
+      logger.info('[DB] 🧪 Using mongodb-memory-server (test mode)');
     } catch (err) {
-      logger.error(`[DB] ❌ Failed to start in-memory MongoDB: ${err.message}`);
+      logger.error(`[DB] ❌ Failed to start mongodb-memory-server: ${err.message}`);
       throw err;
     }
+  } else {
+    if (!env.db.uri) {
+      throw new Error(
+        'MONGODB_URI is missing. Please configure it in backend/.env'
+      );
+    }
+
+    mongoUri = env.db.uri;
+    logger.info('[DB] ☁️ Using MongoDB Atlas');
   }
 
   let attempt = 0;
 
   while (attempt < MAX_RETRIES) {
     try {
-      attempt += 1;
+      attempt++;
       logger.info(`[DB] Connection attempt ${attempt}/${MAX_RETRIES}...`);
 
       await mongoose.connect(mongoUri, MONGO_OPTIONS);
-      logger.info(`[DB] ✅ Connected to MongoDB — ${maskUri(mongoUri)}`);
+
+      logger.info(
+        `[DB] ✅ Connected to MongoDB — ${maskUri(mongoUri)}`
+      );
 
       _attachConnectionListeners();
       return mongoose.connection;
@@ -60,12 +75,13 @@ async function connectDatabase() {
       logger.error(`[DB] ❌ Attempt ${attempt} failed: ${err.message}`);
 
       if (attempt >= MAX_RETRIES) {
-        logger.error('[DB] Max retries reached. Exiting...');
-        process.exit(1);
+        logger.error('[DB] Max retries reached.');
+        throw err;
       }
 
       const delay = RETRY_DELAY_MS * attempt;
-      logger.info(`[DB] Retrying in ${delay}ms...`);
+      logger.info(`[DB] Retrying in ${delay} ms...`);
+
       await _sleep(delay);
     }
   }

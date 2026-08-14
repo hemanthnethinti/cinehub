@@ -29,7 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
     setState(() => _loading = true);
     try {
-      final uri = Uri.parse('http://localhost:4000/login');
+      final uri = Uri.parse('http://10.70.14.31:5000/login');
       final resp = await http.post(uri,
           headers: {'Content-Type': 'application/json'}, body: jsonEncode({'identifier': id, 'password': pwd}));
       if (resp.statusCode == 200) {
@@ -131,7 +131,7 @@ class _SignupScreenState extends State<SignupScreen> {
     if (phone.isEmpty) return;
     setState(() => _sending = true);
     try {
-      final uri = Uri.parse('http://localhost:4000/send-otp');
+      final uri = Uri.parse('http://10.70.14.31:5000/send-otp');
       final resp = await http.post(uri, headers: {'Content-Type': 'application/json'}, body: jsonEncode({'phone': phone}));
       if (resp.statusCode == 200) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('OTP sent')));
       else ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to send OTP')));
@@ -148,7 +148,7 @@ class _SignupScreenState extends State<SignupScreen> {
     if (phone.isEmpty || code.isEmpty) return;
     setState(() => _verifying = true);
     try {
-      final uri = Uri.parse('http://localhost:4000/verify-otp');
+      final uri = Uri.parse('http://10.70.14.31:5000/verify-otp');
       final resp = await http.post(uri, headers: {'Content-Type': 'application/json'}, body: jsonEncode({'phone': phone, 'otp': code}));
       if (resp.statusCode == 200) {
         final body = jsonDecode(resp.body);
@@ -171,7 +171,7 @@ class _SignupScreenState extends State<SignupScreen> {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please verify phone first')));
       return;
     }
-    final uri = Uri.parse('http://localhost:4000/register');
+    final uri = Uri.parse('http://10.70.14.31:5000/register');
     final body = jsonEncode({
       'fullName': _fullName.text.trim(),
       'email': _email.text.trim(),
@@ -189,7 +189,7 @@ class _SignupScreenState extends State<SignupScreen> {
           try {
             final lid = _phone.text.trim();
             final lpwd = _password.text;
-            final luri = Uri.parse('http://localhost:4000/login');
+            final luri = Uri.parse('http://10.70.14.31:5000/login');
             final lresp = await http.post(luri, headers: {'Content-Type': 'application/json'}, body: jsonEncode({'identifier': lid, 'password': lpwd}));
             if (lresp.statusCode == 200) {
               final lbody = jsonDecode(lresp.body);

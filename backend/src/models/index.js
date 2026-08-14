@@ -9,5 +9,7 @@ const Team = require('./team.model');
 const Portfolio = require('./portfolio.model');
 const Notification = require('./notification.model');
 const Media = require('./media.model');
+const Conversation = require('./conversation.model');
+const Message = require('./message.model');
 
-module.exports = { User, Project, Script, Team, Portfolio, Notification, Media };
+module.exports = { User, Project, Script, Team, Portfolio, Notification, Media, Conversation, Message };

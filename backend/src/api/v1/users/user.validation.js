@@ -12,6 +12,7 @@ const updateProfile = {
     lastName: Joi.string().trim().max(50),
     bio: Joi.string().max(500).allow(''),
     headline: Joi.string().max(150).allow(''),
+    avatar: Joi.string().uri().allow(''),
     location: Joi.object({ city: Joi.string(), state: Joi.string(), country: Joi.string() }),
     skills: Joi.array().items(Joi.object({
       name: Joi.string().required(),

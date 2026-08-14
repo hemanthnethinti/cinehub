@@ -3,12 +3,32 @@
  * @description Centralized environment variable validation and access.
  * Fails fast on missing required variables — no silent misconfiguration.
  */
+const fs = require('fs');
 const dotenv = require('dotenv');
 const path = require('path');
 const Joi = require('joi');
+// Determine current environment
+const nodeEnv = process.env.NODE_ENV || 'development';
 
-// Load .env from project root
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+// Environment file name
+const envFile = `.env.${nodeEnv}`;
+
+// Full paths
+const envPath = path.resolve(__dirname, `../../${envFile}`);
+const fallbackPath = path.resolve(__dirname, '../../.env');
+
+// Select environment file once
+const selectedEnvPath = fs.existsSync(envPath)
+  ? envPath
+  : fallbackPath;
+
+// Load environment variables
+dotenv.config({
+  path: selectedEnvPath,
+});
+
+console.log(`🌍 Loaded environment: ${path.basename(selectedEnvPath)}`);
+
 
 const envSchema = Joi.object({
   // ── Application ───────────────────────────

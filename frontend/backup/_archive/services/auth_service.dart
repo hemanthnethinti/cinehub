@@ -13,9 +13,9 @@ class AuthService {
   String get _baseUrl {
     // Use emulator host for Android emulators
     try {
-      if (Platform.isAndroid) return 'http://10.0.2.2:4000';
+      if (Platform.isAndroid) return 'http://10.70.14.31:5000';
     } catch (_) {}
-    return 'http://localhost:4000';
+    return 'http://10.70.14.31:5000';
   }
 
   void setFromLogin(dynamic body) {

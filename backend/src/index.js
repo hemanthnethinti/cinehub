@@ -30,7 +30,7 @@ async function bootstrap() {
     }
 
     // 4. Start HTTP server
-    server = app.listen(PORT, () => {
+    server = app.listen(PORT, '0.0.0.0', () => {
       logger.info(`
 ╔═══════════════════════════════════════════════╗
 ║                                               ║

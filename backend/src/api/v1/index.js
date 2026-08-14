@@ -10,6 +10,14 @@ const router = express.Router();
 // Apply global rate limiter to all v1 routes
 router.use(apiLimiter);
 
+// ── V1 Root Endpoint ────────────────────────
+router.get('/', (_req, res) => {
+  res.json({
+    status: 'success',
+    message: 'CineHub API is running'
+  });
+});
+
 // ── Module Routes ───────────────────────────
 
 router.use('/auth', require('./auth/auth.routes'));
@@ -22,6 +30,7 @@ router.use('/notifications', require('./notifications/notification.routes').rout
 router.use('/discovery', require('./discovery/discovery.routes'));
 router.use('/media', require('./media/media.routes'));
 router.use('/ai', require('./ai/ai.routes'));
+router.use('/messaging', require('./messaging/messaging.routes'));
 
 // ── Health Check ────────────────────────────
 

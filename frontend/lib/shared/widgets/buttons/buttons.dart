@@ -4,6 +4,7 @@ import 'package:cinehubapp/core/theme/app_decorations.dart';
 import 'package:cinehubapp/core/theme/app_radius.dart';
 import 'package:cinehubapp/core/theme/app_spacing.dart';
 import 'package:cinehubapp/core/theme/app_typography.dart';
+import 'package:shimmer/shimmer.dart';
 
 // ═══════════════════════════════════════════════════════════════
 //  PRIMARY BUTTON
@@ -56,14 +57,11 @@ class PrimaryButton extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
           ),
           child: isLoading
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                )
+                ? Shimmer.fromColors(
+                    baseColor: Colors.white,
+                    highlightColor: Colors.white.withAlpha(50),
+                    child: Text(label, style: AppTypography.button),
+                  )
               : Row(
                   mainAxisSize: isExpanded ? MainAxisSize.max : MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,

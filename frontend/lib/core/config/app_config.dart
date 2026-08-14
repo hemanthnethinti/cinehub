@@ -19,12 +19,12 @@ abstract final class AppConfig {
   static String get baseUrl => switch (environment) {
         Environment.production  => 'https://api.cinehub.app',
         Environment.staging     => 'https://api-staging.cinehub.app',
-        Environment.development => 'http://10.0.2.2:4000', // Android emulator → localhost
+        Environment.development => 'http://10.70.14.31:5000', // Android emulator → localhost
       };
 
   static String get socketUrl => baseUrl;
 
   static String get apiVersion => 'v1';
 
-  static String get apiBase => '$baseUrl/api/$apiVersion';
+  static String get apiBase => '$baseUrl/api/$apiVersion/';
 }

@@ -21,7 +21,7 @@ class RefreshInterceptor extends Interceptor {
     ErrorInterceptorHandler handler,
   ) async {
     final isUnauthorized  = err.response?.statusCode == 401;
-    final isRefreshPath   = err.requestOptions.path.contains('/auth/refresh');
+    final isRefreshPath   = err.requestOptions.path.contains('auth/refresh-tokens');
 
     if (!isUnauthorized || isRefreshPath || _isRefreshing) {
       return handler.next(err);
@@ -35,11 +35,10 @@ class RefreshInterceptor extends Interceptor {
         return handler.next(err);
       }
 
-      // Call refresh endpoint with a clean Dio instance to avoid
-      // re-triggering this interceptor.
+      // Call refresh endpoint using the same baseUrl (already includes /api/v1).
       final refreshDio = Dio(BaseOptions(baseUrl: dio.options.baseUrl));
       final response = await refreshDio.post(
-        '/api/v1/auth/refresh',
+        'auth/refresh-tokens',
         data: {'refreshToken': refreshToken},
       );
 

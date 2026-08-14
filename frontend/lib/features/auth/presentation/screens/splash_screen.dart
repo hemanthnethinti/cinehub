@@ -7,6 +7,7 @@ import 'package:cinehubapp/core/theme/app_decorations.dart';
 import 'package:cinehubapp/core/theme/app_typography.dart';
 import 'package:cinehubapp/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:cinehubapp/features/auth/presentation/providers/auth_providers.dart';
+import 'package:cinehubapp/shared/widgets/feedback/feedback_widgets.dart';
 
 /// Entry screen shown while checking for a stored session.
 ///
@@ -111,14 +112,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 ),
                 const SizedBox(height: 56),
                 // ── Loading indicator ──────────────────────────
-                SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: AppColors.primary.withValues(alpha: 0.6),
-                  ),
-                ),
+                const ShimmerBox(width: 80, height: 4, borderRadius: BorderRadius.all(Radius.circular(2))),
               ],
             ),
           ),

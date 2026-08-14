@@ -9,8 +9,8 @@ const userValidation = require('./user.validation');
 const router = express.Router();
 
 router.get('/', authenticate(), validate(userValidation.listUsers), userController.listUsers);
-router.get('/:id', validate(userValidation.getUser), userController.getUser);
 router.patch('/profile', authenticate(), validate(userValidation.updateProfile), userController.updateProfile);
+router.get('/:id', validate(userValidation.getUser), userController.getUser);
 router.post('/:id/follow', authenticate(), userController.followUser);
 router.delete('/:id/follow', authenticate(), userController.unfollowUser);
 router.get('/:id/followers', validate(userValidation.getUser), userController.getFollowers);

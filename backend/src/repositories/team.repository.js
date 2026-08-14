@@ -16,13 +16,13 @@ class TeamRepository extends BaseRepository {
   }
 
   async addMember(teamId, memberData) {
-    return this.model.findByIdAndUpdate(teamId, { $push: { members: memberData } }, { new: true });
+    return this.model.findByIdAndUpdate(teamId, { $push: { members: memberData } }, { new: true }).populate('owner members.user');
   }
 
   async removeMember(teamId, userId) {
     return this.model.findByIdAndUpdate(teamId, {
       $pull: { members: { user: userId } },
-    }, { new: true });
+    }, { new: true }).populate('owner members.user');
   }
 
   async updateMemberStatus(teamId, userId, status) {
@@ -30,7 +30,7 @@ class TeamRepository extends BaseRepository {
       { _id: teamId, 'members.user': userId },
       { $set: { 'members.$.status': status, ...(status === 'active' ? { 'members.$.joinedAt': new Date() } : {}) } },
       { new: true },
-    );
+    ).populate('owner members.user');
   }
 }
 

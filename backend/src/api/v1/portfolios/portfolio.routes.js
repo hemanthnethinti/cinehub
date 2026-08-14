@@ -13,7 +13,8 @@ const eventEmitter = require('../../../events/emitter');
 
 class PortfolioService {
   async create(userId, data) {
-    return portfolioRepo.create({ ...data, owner: userId });
+    const item = await portfolioRepo.create({ ...data, owner: userId });
+    return portfolioRepo.findById(item._id, { populate: 'owner' });
   }
 
   async getById(id) {
@@ -27,7 +28,8 @@ class PortfolioService {
     const item = await portfolioRepo.findById(id);
     if (!item) throw ApiError.notFound('Portfolio item not found');
     if (item.owner.toString() !== userId.toString()) throw ApiError.forbidden('Not your portfolio item');
-    return portfolioRepo.updateById(id, data);
+    await portfolioRepo.updateById(id, data);
+    return portfolioRepo.findById(id, { populate: 'owner' });
   }
 
   async delete(id, userId) {
@@ -68,7 +70,7 @@ class PortfolioService {
     doc.comments.push({ user: userId, content });
     await doc.save();
     eventEmitter.emit('portfolio:commented', { portfolioId, userId });
-    return doc;
+    return Portfolio.findById(portfolioId).populate('owner');
   }
 }
 

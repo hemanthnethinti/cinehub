@@ -21,7 +21,7 @@ class ProjectService {
     await projectRepo.updateById(project._id, { team: team._id });
     eventEmitter.emit('project:created', { projectId: project._id, ownerId: userId });
 
-    return { ...project.toJSON ? project.toJSON() : project, team: team._id };
+    return projectRepo.findById(project._id, { populate: 'owner team' });
   }
 
   async getProjectById(id) {
@@ -43,7 +43,8 @@ class ProjectService {
     if (project.owner.toString() !== userId.toString()) {
       throw ApiError.forbidden('Only the project owner can update this project');
     }
-    return projectRepo.updateById(projectId, updateData);
+    await projectRepo.updateById(projectId, updateData);
+    return projectRepo.findById(projectId, { populate: 'owner team' });
   }
 
   async deleteProject(projectId, userId) {

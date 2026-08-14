@@ -10,78 +10,51 @@ import 'package:cinehubapp/features/auth/presentation/screens/forgot_password_sc
 import 'package:cinehubapp/features/auth/presentation/screens/login_screen.dart';
 import 'package:cinehubapp/features/auth/presentation/screens/register_screen.dart';
 import 'package:cinehubapp/features/auth/presentation/screens/splash_screen.dart';
+import 'package:cinehubapp/features/profile/presentation/screens/edit_profile_screen.dart';
+import 'package:cinehubapp/features/profile/presentation/screens/followers_screen.dart';
+import 'package:cinehubapp/features/profile/presentation/screens/following_screen.dart';
+import 'package:cinehubapp/features/profile/presentation/screens/profile_screen.dart';
+import 'package:cinehubapp/features/home/presentation/screens/home_screen.dart';
+import 'package:cinehubapp/features/discover/presentation/screens/discover_screen.dart';
+import 'package:cinehubapp/features/projects/presentation/screens/projects_screen.dart';
+import 'package:cinehubapp/features/projects/presentation/screens/project_detail_screen.dart';
+import 'package:cinehubapp/features/projects/presentation/screens/project_form_screen.dart';
+import 'package:cinehubapp/features/teams/presentation/screens/team_screen.dart';
+import 'package:cinehubapp/features/messaging/presentation/screens/conversations_screen.dart';
+import 'package:cinehubapp/features/messaging/presentation/screens/chat_screen.dart';
+import 'package:cinehubapp/features/messaging/presentation/screens/new_conversation_screen.dart';
+import 'package:cinehubapp/features/teams/presentation/screens/invite_member_screen.dart';
+import 'package:cinehubapp/features/notifications/presentation/screens/notifications_screen.dart';
+import 'package:cinehubapp/features/settings/presentation/screens/settings_screen.dart';
+import 'package:cinehubapp/features/settings/presentation/screens/account_screen.dart';
+import 'package:cinehubapp/features/settings/presentation/screens/privacy_screen.dart';
+import 'package:cinehubapp/features/settings/presentation/screens/notification_settings_screen.dart';
+import 'package:cinehubapp/features/settings/presentation/screens/appearance_screen.dart';
+import 'package:cinehubapp/features/settings/presentation/screens/about_screen.dart';
+import 'package:cinehubapp/features/portfolio/presentation/screens/portfolio_screen.dart';
+import 'package:cinehubapp/features/portfolio/presentation/screens/portfolio_detail_screen.dart';
+import 'package:cinehubapp/features/portfolio/presentation/screens/portfolio_editor_screen.dart';
+import 'package:cinehubapp/features/search/presentation/screens/search_screen.dart';
+import 'package:cinehubapp/features/search/presentation/screens/search_results_screen.dart';
+import 'package:cinehubapp/features/ai/presentation/screens/ai_studio_screen.dart';
+import 'package:cinehubapp/features/ai/presentation/screens/ai_history_screen.dart';
+import 'package:cinehubapp/features/admin/presentation/screens/admin_dashboard_screen.dart';
+import 'package:cinehubapp/features/admin/presentation/screens/admin_users_screen.dart';
+import 'package:cinehubapp/features/admin/presentation/screens/admin_projects_screen.dart';
+import 'package:cinehubapp/features/admin/presentation/screens/admin_moderation_screen.dart';
+import 'package:cinehubapp/features/admin/presentation/screens/admin_reports_screen.dart';
+import 'package:cinehubapp/features/admin/presentation/screens/admin_analytics_screen.dart';
 import 'routes.dart';
-
 
 // ═══════════════════════════════════════════════════════════════
 //  PLACEHOLDER SHELL SCREENS (Phase 2 → replaced per phase)
 // ═══════════════════════════════════════════════════════════════
 
-class _HomeScreen extends StatelessWidget {
-  const _HomeScreen();
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        backgroundColor: AppColors.background,
-        body: Center(child: Text('Home — Phase 4', style: AppTypography.headlineMedium)),
-      );
-}
+// _HomeScreen placeholder removed in Phase 3.1
 
-class _DiscoverScreen extends StatelessWidget {
-  const _DiscoverScreen();
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        backgroundColor: AppColors.background,
-        body: Center(child: Text('Discover — Phase 6', style: AppTypography.headlineMedium)),
-      );
-}
+// _DiscoverScreen placeholder removed in Phase 3.3
 
-class _ProjectsScreen extends StatelessWidget {
-  const _ProjectsScreen();
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        backgroundColor: AppColors.background,
-        body: Center(child: Text('Projects — Phase 5', style: AppTypography.headlineMedium)),
-      );
-}
-
-class _MessagesScreen extends StatelessWidget {
-  const _MessagesScreen();
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        backgroundColor: AppColors.background,
-        body: Center(child: Text('Messages — Phase 7', style: AppTypography.headlineMedium)),
-      );
-}
-
-class _ProfileScreen extends ConsumerWidget {
-  const _ProfileScreen();
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final user = (ref.watch(authNotifierProvider) as AuthAuthenticated?)?.user;
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Profile — Phase 3', style: AppTypography.headlineMedium),
-            if (user != null) ...[
-              const SizedBox(height: AppSpacing.lg),
-              Text(user.fullName, style: AppTypography.bodyLarge),
-              Text(user.email, style: AppTypography.bodySmall),
-              const SizedBox(height: AppSpacing.xl),
-              TextButton.icon(
-                icon: const Icon(Icons.logout_rounded, size: 18),
-                label: const Text('Logout'),
-                onPressed: () => ref.read(authNotifierProvider.notifier).logout(),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
+// _ProjectsScreen placeholder removed in Phase 4.1
 
 // ═══════════════════════════════════════════════════════════════
 //  APP SHELL
@@ -103,6 +76,12 @@ class _AppShell extends StatelessWidget {
   Widget build(BuildContext context) => Scaffold(
         backgroundColor: AppColors.background,
         body: navigationShell,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => context.push(Routes.aiStudio),
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.onPrimary,
+          child: const Icon(Icons.auto_awesome_rounded),
+        ),
         bottomNavigationBar: NavigationBar(
           selectedIndex: navigationShell.currentIndex,
           onDestinationSelected: (i) => navigationShell.goBranch(
@@ -161,7 +140,145 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      // ── Splash ─────────────────────────────────────────────
+      // ── Top Level ───────────────────────────
+      GoRoute(
+        path: Routes.createProject,
+        builder: (context, state) => const ProjectFormScreen(),
+      ),
+      GoRoute(
+        path: Routes.editProject,
+        builder: (context, state) => ProjectFormScreen(
+          projectId: state.pathParameters['id']!,
+        ),
+      ),
+      GoRoute(
+        path: Routes.projectDetail,
+        builder: (context, state) => ProjectDetailScreen(
+          projectId: state.pathParameters['id']!,
+        ),
+      ),
+      GoRoute(
+        path: Routes.projectTeam,
+        builder: (context, state) => TeamScreen(
+          projectId: state.pathParameters['id']!,
+        ),
+      ),
+      GoRoute(
+        path: Routes.inviteMember,
+        builder: (context, state) => InviteMemberScreen(
+          projectId: state.pathParameters['id']!,
+        ),
+      ),
+      GoRoute(
+        path: Routes.chat,
+        builder: (context, state) => ChatScreen(
+          conversationId: state.pathParameters['id']!,
+        ),
+      ),
+      GoRoute(
+        path: Routes.newConversation,
+        builder: (context, state) => const NewConversationScreen(),
+      ),
+      GoRoute(
+        path: Routes.portfolio,
+        builder: (context, state) => PortfolioScreen(
+          // we could pass userId if we were filtering by user, for now it's featured
+        ),
+      ),
+      GoRoute(
+        path: Routes.portfolioDetail,
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return PortfolioDetailScreen(id: id);
+        },
+      ),
+      GoRoute(
+        path: Routes.portfolioEditor,
+        builder: (context, state) {
+          final id = state.pathParameters['id'];
+          return PortfolioEditorScreen(id: id);
+        },
+      ),
+      GoRoute(
+        path: Routes.search,
+        builder: (context, state) => const SearchScreen(),
+      ),
+      GoRoute(
+        path: Routes.searchResults,
+        builder: (context, state) {
+          final query = state.pathParameters['query']!;
+          return SearchResultsScreen(query: query);
+        },
+      ),
+      GoRoute(
+        path: Routes.aiStudio,
+        builder: (context, state) => const AiStudioScreen(),
+      ),
+      GoRoute(
+        path: Routes.aiHistory,
+        builder: (context, state) => const AiHistoryScreen(),
+      ),
+      GoRoute(
+        path: Routes.notifications,
+        builder: (context, state) => const NotificationsScreen(),
+      ),
+      GoRoute(
+        path: Routes.settings,
+        builder: (context, state) => const SettingsScreen(),
+        routes: [
+          GoRoute(
+            path: 'account',
+            name: Routes.accountSettings,
+            builder: (context, state) => const AccountScreen(),
+          ),
+          GoRoute(
+            path: 'privacy',
+            name: Routes.privacySettings,
+            builder: (context, state) => const PrivacyScreen(),
+          ),
+          GoRoute(
+            path: 'notifications',
+            name: Routes.notificationSettings,
+            builder: (context, state) => const NotificationSettingsScreen(),
+          ),
+          GoRoute(
+            path: 'appearance',
+            name: Routes.appearanceSettings,
+            builder: (context, state) => const AppearanceScreen(),
+          ),
+          GoRoute(
+            path: 'about',
+            name: Routes.aboutSettings,
+            builder: (context, state) => const AboutScreen(),
+          ),
+        ],
+      ),
+      // ── Admin ───────────────────────────────────────────────
+      GoRoute(
+        path: Routes.admin,
+        builder: (context, state) => const AdminDashboardScreen(),
+      ),
+      GoRoute(
+        path: Routes.adminUsers,
+        builder: (context, state) => const AdminUsersScreen(),
+      ),
+      GoRoute(
+        path: Routes.adminProjects,
+        builder: (context, state) => const AdminProjectsScreen(),
+      ),
+      GoRoute(
+        path: Routes.adminModeration,
+        builder: (context, state) => const AdminModerationScreen(),
+      ),
+      GoRoute(
+        path: Routes.adminReports,
+        builder: (context, state) => const AdminReportsScreen(),
+      ),
+      GoRoute(
+        path: Routes.adminAnalytics,
+        builder: (context, state) => const AdminAnalyticsScreen(),
+      ),
+      // ── Sub-routes ─────────────────────────────────────────────
       GoRoute(
         path: Routes.splash,
         builder: (_, __) => const SplashScreen(),
@@ -186,21 +303,40 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (_, __, shell) => _AppShell(navigationShell: shell),
         branches: [
           StatefulShellBranch(routes: [
-            GoRoute(path: Routes.home, builder: (_, __) => const _HomeScreen()),
+            GoRoute(path: Routes.home, builder: (_, __) => const HomeScreen()),
           ]),
           StatefulShellBranch(routes: [
-            GoRoute(path: Routes.discover, builder: (_, __) => const _DiscoverScreen()),
+            GoRoute(path: Routes.discover, builder: (_, __) => const DiscoverScreen()),
           ]),
           StatefulShellBranch(routes: [
-            GoRoute(path: Routes.projects, builder: (_, __) => const _ProjectsScreen()),
+            GoRoute(path: Routes.projects, builder: (_, __) => const ProjectsScreen()),
           ]),
           StatefulShellBranch(routes: [
-            GoRoute(path: Routes.messages, builder: (_, __) => const _MessagesScreen()),
+            GoRoute(path: Routes.messages, builder: (_, __) => const ConversationsScreen()),
           ]),
           StatefulShellBranch(routes: [
-            GoRoute(path: Routes.profile, builder: (_, __) => const _ProfileScreen()),
+            GoRoute(
+              path: Routes.profile,
+              builder: (_, __) => const ProfileScreen(),
+            ),
           ]),
         ],
+      ),
+      GoRoute(
+        path: Routes.editProfile,
+        builder: (_, __) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        path: Routes.userProfile,
+        builder: (context, state) => ProfileScreen(userId: state.pathParameters['id']),
+      ),
+      GoRoute(
+        path: Routes.followers,
+        builder: (context, state) => FollowersScreen(userId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: Routes.following,
+        builder: (context, state) => FollowingScreen(userId: state.pathParameters['id']!),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
