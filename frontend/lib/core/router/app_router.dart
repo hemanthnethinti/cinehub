@@ -79,7 +79,7 @@ class _AppShell extends StatelessWidget {
         floatingActionButton: FloatingActionButton(
           onPressed: () => context.push(Routes.aiStudio),
           backgroundColor: AppColors.primary,
-          foregroundColor: AppColors.onPrimary,
+          foregroundColor: AppColors.textPrimary,
           child: const Icon(Icons.auto_awesome_rounded),
         ),
         bottomNavigationBar: NavigationBar(

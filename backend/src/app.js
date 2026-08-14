@@ -24,8 +24,25 @@ app.use(helmet({
 }));
 
 // ── CORS ────────────────────────────────────
+const corsOrigin = env.isDev
+  ? (origin, callback) => {
+      // In development: allow any localhost port, the LAN IP, and requests
+      // with no origin (e.g. mobile apps, Postman, curl).
+      if (
+        !origin ||
+        /^http:\/\/localhost(:\d+)?$/.test(origin) ||
+        /^http:\/\/127\.0\.0\.1(:\d+)?$/.test(origin) ||
+        origin.startsWith('http://10.')
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS: origin '${origin}' not allowed`));
+      }
+    }
+  : env.clientUrl;
+
 app.use(cors({
-  origin: env.clientUrl,
+  origin: corsOrigin,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-Id'],

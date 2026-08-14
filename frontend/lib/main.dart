@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app.dart';
+import 'core/config/dev_overrides.dart';
 import 'core/di/providers.dart';
 
 /// CineHub entry point.
@@ -12,6 +13,7 @@ import 'core/di/providers.dart';
 ///   3. [ProviderScope] with overrides            — makes prefs available to all providers
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await DevOverrides.load(); // loads assets/dev_config.json in debug mode
   final prefs = await SharedPreferences.getInstance();
 
   runApp(

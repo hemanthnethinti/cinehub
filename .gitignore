@@ -55,3 +55,6 @@ legacy/otp-server/node_modules/
 # Never commit real .env files
 backend/.env
 *.env.local
+
+# Local dev config — never commit (contains machine-specific LAN IP)
+frontend/assets/dev_config.json
